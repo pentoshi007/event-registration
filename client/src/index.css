@@ -315,7 +315,7 @@ html {
   transition: all 0.3s ease;
 }
 
-/* Scroll animations - initially hidden */
+/* Scroll animations - Clean implementation */
 .animate-on-scroll {
   opacity: 0;
   transform: translateY(30px);
@@ -325,6 +325,22 @@ html {
 .animate-on-scroll.animate-fade-in-up {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .animate-on-scroll {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Fallback for when JavaScript fails to load */
+.no-js .animate-on-scroll {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
 }
 
 /* Focus styles */

@@ -25,15 +25,17 @@ const HomePage: React.FC = () => {
     type: 'success' | 'error';
     text: string;
   } | null>(null);
+  const [isClient, setIsClient] = useState(false);
+  const [animationsReady, setAnimationsReady] = useState(false);
 
   // Animation refs
   const heroRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
   const eventsRef = useRef<HTMLDivElement>(null);
 
-  // Responsive pagination sizes
+  // Responsive pagination sizes - Safe window access
   const getInitialLimit = () => {
-    // Load 7 total events: 1 featured + 6 regular (desktop) or 1 featured + 3 regular (mobile)
+    if (typeof window === 'undefined') return 7; // Default for SSR
     return window.innerWidth >= 768 ? 7 : 4; // Desktop: 7 (1+6), Mobile: 4 (1+3)
   };
 
@@ -42,35 +44,63 @@ const HomePage: React.FC = () => {
   };
 
   useEffect(() => {
+    // Set client-side flag to prevent hydration mismatches
+    setIsClient(true);
     loadInitialEvents();
-    setupIntersectionObserver();
   }, []);
 
   useEffect(() => {
+    // Setup animations only after content is loaded and client is ready
+    if (isClient && !loading && events.length > 0 && !animationsReady) {
+      const timer = setTimeout(() => {
+        setAnimationsReady(true);
+        triggerScrollAnimations();
+      }, 100); // Small delay to ensure DOM is ready
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isClient, loading, events.length, animationsReady]);
+
+  useEffect(() => {
     // Reload events when search or category changes
-    loadInitialEvents();
-  }, [searchTerm, selectedCategory]);
+    if (isClient) {
+      setAnimationsReady(false); // Reset animations for new content
+      loadInitialEvents();
+    }
+  }, [searchTerm, selectedCategory, isClient]);
 
-  const setupIntersectionObserver = () => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-fade-in-up');
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: '50px' }
-    );
+  const triggerScrollAnimations = () => {
+    if (typeof window === 'undefined') return;
 
-    // Observe elements with animation class
-    setTimeout(() => {
+    // Use intersection observer if available, otherwise trigger immediately
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('animate-fade-in-up');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '50px' }
+      );
+
+      // Observe all animation elements
       document.querySelectorAll('.animate-on-scroll').forEach((el) => {
         observer.observe(el);
       });
-    }, 100);
 
-    return () => observer.disconnect();
+      // Cleanup function
+      return () => observer.disconnect();
+    } else {
+      // Fallback: trigger all animations immediately
+      document.querySelectorAll('.animate-on-scroll').forEach((el, index) => {
+        setTimeout(() => {
+          el.classList.add('animate-fade-in-up');
+        }, index * 100);
+      });
+    }
   };
 
   const loadInitialEvents = async () => {
@@ -403,9 +433,7 @@ const HomePage: React.FC = () => {
                 {events.slice(1).map((event, index) => (
                   <div
                     key={event._id}
-                    className={`event-card animate-on-scroll transition-all duration-300 ${
-                      index < (window.innerWidth >= 768 ? 6 : 3) ? 'animate-fade-in-up' : ''
-                    }`}
+                    className={`event-card animate-on-scroll transition-all duration-300`}
                     style={{
                       animationDelay: `${(index % 6) * 100}ms`
                     }}
@@ -508,46 +536,48 @@ const HomePage: React.FC = () => {
 
               {/* Registration Message */}
               {registrationMessage && (
-                <div className={`p-4 rounded-lg border animate-scaleUp ${
+                <div className={`animate-scaleUp p-4 rounded-lg border ${
                   registrationMessage.type === 'success'
                     ? 'bg-green-50 border-green-200 text-green-800'
                     : 'bg-red-50 border-red-200 text-red-800'
                 }`}>
                   <div className="flex items-center">
                     {registrationMessage.type === 'success' ? (
-                      <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
+                      <div className="flex-shrink-0 mr-3">
+                        <svg className="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
                     ) : (
-                      <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
+                      <div className="flex-shrink-0 mr-3">
+                        <svg className="h-5 w-5 text-red-600 animate-bounce" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      </div>
                     )}
-                    <span className="font-medium">{registrationMessage.text}</span>
+                    <span className="text-sm font-medium">{registrationMessage.text}</span>
                   </div>
                 </div>
               )}
 
-              <div className="flex gap-4 animate-slideDown" style={{ animationDelay: '0.5s', animationFillMode: 'both' }}>
+              {/* Action Buttons */}
+              <div className="flex gap-4 pt-4">
                 <button
                   type="button"
                   onClick={() => setShowRegisterModal(false)}
                   disabled={isRegistering}
-                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isRegistering}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 active:scale-95"
                 >
                   {isRegistering ? (
                     <>
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white inline-block mr-2"></div>
                       Registering...
                     </>
                   ) : (

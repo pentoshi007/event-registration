@@ -11,12 +11,15 @@ export interface IUser extends Document {
 const userSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true },
     role: { type: String, enum: ['admin', 'user'], default: 'user' },
     avatar: { type: String },
     password: { type: String },
   },
   { timestamps: true }
 );
+
+// Add unique index for email to prevent duplicates
+userSchema.index({ email: 1 }, { unique: true });
 
 export default model<IUser>('User', userSchema); 
