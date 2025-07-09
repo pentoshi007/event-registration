@@ -200,7 +200,7 @@ async function connectDB() {
   try {
     const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://aniket00736:ak802135@cluster0.h8lwxvz.mongodb.net/evently?retryWrites=true&w=majority&appName=Cluster0';
     await mongoose.connect(mongoURI);
-    console.log('Connected to MongoDB Atlas');
+    console.log('Connected to MongoDB Atlas for seeding');
   } catch (error) {
     console.error('Error connecting to MongoDB:', error);
     process.exit(1);
@@ -312,9 +312,82 @@ async function seedDatabase() {
   }
 }
 
-// Run the seed function if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  seedDatabase();
+// Check if database needs seeding (is empty)
+export async function needsSeeding() {
+  try {
+    const eventCount = await Event.countDocuments();
+    const userCount = await User.countDocuments();
+    
+    // If both events and users collections are empty, we need seeding
+    return eventCount === 0 && userCount === 0;
+  } catch (error) {
+    console.error('Error checking if database needs seeding:', error);
+    return false;
+  }
 }
 
-export default seedDatabase; 
+// Auto-seed function that only seeds if database is empty
+export async function autoSeed() {
+  try {
+    if (await needsSeeding()) {
+      console.log('🌱 Database is empty, auto-seeding...');
+      
+      await seedEvents();
+      await seedUsers();
+      await seedRegistrations();
+      
+      console.log('🎉 Auto-seeding completed successfully!');
+      
+      // Show stats
+      const eventCount = await Event.countDocuments();
+      const userCount = await User.countDocuments();
+      const registrationCount = await Registration.countDocuments();
+      
+      console.log(`📊 Database Stats:`);
+      console.log(`   Events: ${eventCount}`);
+      console.log(`   Users: ${userCount}`);
+      console.log(`   Registrations: ${registrationCount}`);
+    } else {
+      console.log('✅ Database already has data, skipping auto-seed');
+    }
+  } catch (error) {
+    console.error('❌ Error during auto-seeding:', error);
+  }
+}
+
+// Manual seed function for development
+async function manualSeedDatabase() {
+  try {
+    await connectDB();
+    
+    await seedEvents();
+    await seedUsers();
+    await seedRegistrations();
+    
+    console.log('🎉 Manual seeding completed successfully!');
+    
+    // Show stats
+    const eventCount = await Event.countDocuments();
+    const userCount = await User.countDocuments();
+    const registrationCount = await Registration.countDocuments();
+    
+    console.log(`📊 Database Stats:`);
+    console.log(`   Events: ${eventCount}`);
+    console.log(`   Users: ${userCount}`);
+    console.log(`   Registrations: ${registrationCount}`);
+    
+  } catch (error) {
+    console.error('❌ Error seeding database:', error);
+  } finally {
+    await mongoose.connection.close();
+    console.log('Database connection closed.');
+  }
+}
+
+// Run the seed function if this file is executed directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  manualSeedDatabase();
+}
+
+export { seedEvents, seedUsers, seedRegistrations };
+export default manualSeedDatabase; 

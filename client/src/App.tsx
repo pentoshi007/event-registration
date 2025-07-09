@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 import AdminDashboard from './pages/AdminDashboard';
 import MyEventsPage from './pages/MyEventsPage';
 
@@ -20,6 +21,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
                 <Route 
                   path="/admin" 
                   element={
@@ -47,15 +49,7 @@ function App() {
                     </ProtectedRoute>
                   } 
                 />
-                <Route 
-                  path="/signup" 
-                  element={
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                      <h1 className="text-3xl font-bold text-gray-900">Sign Up</h1>
-                      <p className="mt-4 text-gray-600">This page is under development.</p>
-                    </div>
-                  } 
-                />
+
               </Routes>
             </div>
             <Footer />

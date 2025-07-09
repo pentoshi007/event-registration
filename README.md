@@ -101,10 +101,15 @@ new-project/
    
    **⚠️ Security Note**: In a production environment, these files should never be committed to version control. For this project, we've included them to ensure seamless setup for all team members.
 
-4. **Seed the database (optional)**
+4. **Database Setup (Automatic)**
+   
+   The database will be automatically seeded with sample data when you start the server for the first time. No manual seeding required!
+   
+   **Optional: Manual seeding**
    ```bash
    cd server
-   npm run seed
+   npm run seed        # Manual seed (if you want to re-seed)
+   npm run seed:force  # Force seed (same as above)
    ```
 
 5. **Start the development servers**

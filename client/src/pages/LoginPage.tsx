@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -253,9 +253,9 @@ const LoginPage: React.FC = () => {
         <div className="text-center animate-fade-in-delay">
           <p className="text-gray-600">
             Don't have an account?{' '}
-            <a href="/signup" className="text-blue-600 hover:text-blue-500 font-medium transition-colors duration-200">
+            <Link to="/signup" className="text-blue-600 hover:text-blue-500 font-medium transition-colors duration-200">
               Sign up
-            </a>
+            </Link>
           </p>
         </div>
       </div>

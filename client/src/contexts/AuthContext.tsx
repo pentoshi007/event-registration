@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '../types';
+import { api } from '../api';
 
 type AuthContextType = {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
+  signup: (userData: { name: string; email: string; password: string; avatar?: string }) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
@@ -37,6 +39,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAuthStatus('loading');
     
     try {
+      // Try real API first
+      try {
+        const response = await api.login({ email, password });
+        if (response.success && response.user) {
+          setAuthStatus('success');
+          
+          // Add a brief delay to show success state
+          await new Promise(resolve => setTimeout(resolve, 800));
+          
+          setUser(response.user);
+          setIsLoading(false);
+          
+          // Reset status after navigation
+          setTimeout(() => setAuthStatus('idle'), 1000);
+          
+          return true;
+        }
+      } catch (apiError) {
+        console.log('API login failed, falling back to mock users');
+      }
+
+      // Fallback to mock users if API fails
       // Simulate API call with realistic delay
       await new Promise(resolve => setTimeout(resolve, 1500));
       
@@ -89,6 +113,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signup = async (userData: { name: string; email: string; password: string; avatar?: string }) => {
+    setIsLoading(true);
+    setAuthStatus('loading');
+    
+    try {
+      const response = await api.register(userData);
+      if (response.success && response.user) {
+        setAuthStatus('success');
+        
+        // Add a brief delay to show success state
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        setUser(response.user);
+        setIsLoading(false);
+        
+        // Reset status after navigation
+        setTimeout(() => setAuthStatus('idle'), 1000);
+        
+        return true;
+      } else {
+        setAuthStatus('error');
+        setIsLoading(false);
+        
+        // Reset error status after delay
+        setTimeout(() => setAuthStatus('idle'), 3000);
+        
+        return false;
+      }
+    } catch (error) {
+      setAuthStatus('error');
+      setIsLoading(false);
+      setTimeout(() => setAuthStatus('idle'), 3000);
+      return false;
+    }
+  };
+
   const logout = () => {
     setIsLoading(true);
     setAuthStatus('loading');
@@ -104,7 +164,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <AuthContext.Provider value={{ 
       user, 
-      login, 
+      login,
+      signup, 
       logout, 
       isAuthenticated: !!user, 
       isAdmin: user?.role === 'admin',

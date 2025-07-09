@@ -26,6 +26,7 @@ export interface ApiResponse<T = any> {
   success: boolean;
   message?: string;
   data?: T;
+  user?: any;
   registration?: Registration;
   registrations?: Registration[];
   count?: number;
@@ -113,4 +114,36 @@ export const api = {
     const query = searchParams.toString();
     return apiCall(`/registrations/event/${eventId}${query ? `?${query}` : ''}`);
   },
+
+  // Authentication APIs
+  // User registration
+  register: (userData: {
+    name: string;
+    email: string;
+    password: string;
+    avatar?: string;
+  }): Promise<ApiResponse> =>
+    apiCall('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    }),
+
+  // User login
+  login: (credentials: {
+    email: string;
+    password: string;
+  }): Promise<ApiResponse> =>
+    apiCall('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    }),
+
+  // Verify JWT token
+  verifyToken: (token: string): Promise<ApiResponse> =>
+    apiCall('/auth/verify', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
 }; 
