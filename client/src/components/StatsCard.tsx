@@ -12,6 +12,7 @@ interface StatsCardProps {
   color?: 'blue' | 'green' | 'purple' | 'red' | 'yellow';
 }
 
+// StatsCard component displays a single statistics card
 const StatsCard: React.FC<StatsCardProps> = ({ 
   title, 
   value, 

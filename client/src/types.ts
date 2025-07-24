@@ -22,6 +22,9 @@ export interface User {
   role: 'admin' | 'user';
   avatar?: string;
   token?: string;
+  phone?: string;
+  dateOfBirth?: string;
+  location?: string;
 }
 
 export interface Registration {

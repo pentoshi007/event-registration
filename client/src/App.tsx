@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -9,54 +10,65 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import AdminDashboard from './pages/AdminDashboard';
 import MyEventsPage from './pages/MyEventsPage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
+import EditProfilePage from './pages/EditProfilePage';
 
+// App component sets up routing, providers, and layout for the application
 function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <Router>
-          <div className="min-h-screen bg-gray-50 flex flex-col">
-            <Navbar />
-            <div className="pt-16 flex-1">
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignupPage />} />
-                <Route 
-                  path="/admin" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <AdminDashboard />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/my-events" 
-                  element={
-                    <ProtectedRoute>
-                      <MyEventsPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/profile" 
-                  element={
-                    <ProtectedRoute>
-                      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                        <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
-                        <p className="mt-4 text-gray-600">This page is under development.</p>
-                      </div>
-                    </ProtectedRoute>
-                  } 
-                />
+      <ThemeProvider>
+        <AuthProvider>
+          <Router>
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors duration-300">
+              <Navbar />
+              <div className="pt-16 flex-1">
 
-              </Routes>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route 
+                    path="/admin" 
+                    element={
+                      <ProtectedRoute adminOnly>
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/my-events" 
+                    element={
+                      <ProtectedRoute>
+                        <MyEventsPage />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/profile" 
+                    element={
+                      <ProtectedRoute>
+                        <EditProfilePage />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/change-password" 
+                    element={
+                      <ProtectedRoute>
+                        <ChangePasswordPage />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route path="/signup" element={<SignupPage />} />
+                </Routes>
+              </div>
+              <Footer />
             </div>
-            <Footer />
-          </div>
-        </Router>
-      </AuthProvider>
+          </Router>
+        </AuthProvider>
+      </ThemeProvider>
     </ErrorBoundary>
+
   );
 }
 

@@ -10,6 +10,7 @@ interface State {
   error?: Error;
 }
 
+// ErrorBoundary component catches and displays errors in the app
 class ErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false,

@@ -6,10 +6,13 @@ interface EventCardProps {
   event: Event;
   onRegister?: (eventId: string) => void;
   onEdit?: (eventId: string) => void;
+  onDelete?: (eventId: string) => void;
   isAdmin?: boolean;
+  showRegisterButton?: boolean;
 }
 
-const EventCard: React.FC<EventCardProps> = ({ event, onRegister, onEdit, isAdmin }) => {
+// EventCard component displays a single event's information
+const EventCard: React.FC<EventCardProps> = ({ event, onRegister, onEdit, onDelete, isAdmin, showRegisterButton = true }) => {
   const isSoldOut = event.currentAttendees >= event.maxAttendees;
   const attendancePercentage = (event.currentAttendees / event.maxAttendees) * 100;
 
@@ -93,24 +96,34 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRegister, onEdit, isAdmi
             </div>
             
             {isAdmin ? (
-              <button
-                onClick={() => onEdit?.(event._id)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200 hover:scale-105 active:scale-95 text-sm"
-              >
-                Edit Event
-              </button>
+              <div className="flex gap-4 justify-center">
+                <button
+                  onClick={() => onEdit?.(event._id)}
+                  className="bg-blue-600 text-white font-bold py-2 px-3 rounded w-24 text-xs hover:bg-blue-700 transition-colors duration-200"
+                >
+                  Edit Event
+                </button>
+                <button
+                  onClick={() => onDelete?.(event._id)}
+                  className="bg-red-600 text-white font-bold py-2 px-3 rounded w-24 text-xs hover:bg-red-700 transition-colors duration-200"
+                >
+                  Delete Event
+                </button>
+              </div>
             ) : (
-              <button
-                onClick={() => onRegister?.(event._id)}
-                disabled={isSoldOut}
-                className={`px-5 py-2 rounded-lg font-semibold transition-all duration-200 hover:scale-105 active:scale-95 text-sm ${
-                  isSoldOut
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md'
-                }`}
-              >
-                {isSoldOut ? 'Sold Out' : 'Register'}
-              </button>
+              showRegisterButton && (
+                <button
+                  onClick={() => onRegister?.(event._id)}
+                  disabled={isSoldOut}
+                  className={`px-5 py-2 rounded-lg font-semibold transition-all duration-200 hover:scale-105 active:scale-95 text-sm ${
+                    isSoldOut
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md'
+                  }`}
+                >
+                  {isSoldOut ? 'Sold Out' : 'Register'}
+                </button>
+              )
             )}
           </div>
           

@@ -8,6 +8,7 @@ interface PopulatedRegistration extends Omit<Registration, 'eventId'> {
   eventId: Event;
 }
 
+// MyEventsPage component shows the events registered by the current user
 const MyEventsPage: React.FC = () => {
   const { user } = useAuth();
   const [registrations, setRegistrations] = useState<PopulatedRegistration[]>([]);
@@ -111,12 +112,12 @@ const MyEventsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen py-12" style={{ backgroundImage: 'url(https://cdn.slidemodel.com/wp-content/uploads/13081-01-gradient-designs-powerpoint-backgrounds-16x9-1.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Events</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold text-white mb-2">My Events</h1>
+          <p className="text-gray-200">
             Events you've registered for{matchedCount > 0 && ` (${matchedCount} registration${matchedCount > 1 ? 's' : ''} found)`}
           </p>
         </div>
@@ -152,8 +153,8 @@ const MyEventsPage: React.FC = () => {
         {/* Events List */}
         {registrations.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-gray-500 text-lg mb-4">No events found</div>
-            <p className="text-gray-400 mb-6">
+            <div className="text-white text-lg mb-4">No events found</div>
+            <p className="text-gray-300 mb-6">
               You haven't registered for any events yet, or no registrations match your email address.
             </p>
             <button 

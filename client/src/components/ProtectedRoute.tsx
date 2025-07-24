@@ -7,6 +7,7 @@ interface ProtectedRouteProps {
   adminOnly?: boolean;
 }
 
+// ProtectedRoute component restricts access to authenticated (and optionally admin) users
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
   adminOnly = false 
