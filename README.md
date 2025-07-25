@@ -1,4 +1,4 @@
-# 🎉 Eventinity - Event Registration Platform
+# 🎉 Eventinity - Event Registration Platform with Admin Dashboard
 A modern, full-stack event registration platform built with React, TypeScript, Node.js, and MongoDB. This application allows users to discover events, register for them, and provides admin functionality for event management.
 ## ✨ Features
 
