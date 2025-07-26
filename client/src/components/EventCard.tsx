@@ -17,7 +17,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRegister, onEdit, onDele
   const attendancePercentage = (event.currentAttendees / event.maxAttendees) * 100;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 ease-out transform hover:-translate-y-1 hover:scale-[1.02] group h-[520px] flex flex-col">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 ease-out transform hover:-translate-y-1 hover:scale-[1.02] group h-[560px] flex flex-col">
       {/* Balanced Image Container */}
       <div className="relative h-52 overflow-hidden flex-shrink-0">
         <img
@@ -38,21 +38,21 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRegister, onEdit, onDele
           </div>
         )}
       </div>
-      
+
       {/* Content Container - Well Balanced */}
-      <div className="p-4 flex flex-col flex-1 justify-between">
+      <div className="p-4 pb-4 flex flex-col flex-1 justify-between">
         {/* Top Content Section */}
         <div className="flex-1">
           {/* Title */}
           <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200 line-clamp-2 leading-tight">
             {event.title}
           </h3>
-          
+
           {/* Description */}
           <p className="text-gray-600 text-sm mb-3 line-clamp-2 leading-relaxed">
             {event.description}
           </p>
-          
+
           {/* Event Details */}
           <div className="space-y-1 mb-3">
             <div className="flex items-center text-sm text-gray-600">
@@ -68,7 +68,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRegister, onEdit, onDele
               <span>{event.currentAttendees} / {event.maxAttendees} attendees</span>
             </div>
           </div>
-          
+
           {/* Attendance Progress Bar */}
           <div className="mb-3">
             <div className="flex justify-between text-xs text-gray-500 mb-1">
@@ -76,17 +76,16 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRegister, onEdit, onDele
               <span>{Math.round(attendancePercentage)}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className={`h-2 rounded-full transition-all duration-500 ${
-                  attendancePercentage >= 90 ? 'bg-red-500' : 
+              <div
+                className={`h-2 rounded-full transition-all duration-500 ${attendancePercentage >= 90 ? 'bg-red-500' :
                   attendancePercentage >= 70 ? 'bg-yellow-500' : 'bg-blue-500'
-                }`}
+                  }`}
                 style={{ width: `${Math.min(attendancePercentage, 100)}%` }}
               />
             </div>
           </div>
         </div>
-        
+
         {/* Bottom Section - Price and Button */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -94,7 +93,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRegister, onEdit, onDele
               <DollarSign className="h-5 w-5 text-green-600 mr-1" />
               <span className="text-xl font-bold text-gray-900">{event.price}</span>
             </div>
-            
+
             {isAdmin ? (
               <div className="flex gap-4 justify-center">
                 <button
@@ -115,20 +114,19 @@ const EventCard: React.FC<EventCardProps> = ({ event, onRegister, onEdit, onDele
                 <button
                   onClick={() => onRegister?.(event._id)}
                   disabled={isSoldOut}
-                  className={`px-5 py-2 rounded-lg font-semibold transition-all duration-200 hover:scale-105 active:scale-95 text-sm ${
-                    isSoldOut
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md'
-                  }`}
+                  className={`px-5 py-2 rounded-lg font-semibold transition-all duration-200 hover:scale-105 active:scale-95 text-sm ${isSoldOut
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md'
+                    }`}
                 >
                   {isSoldOut ? 'Sold Out' : 'Register'}
                 </button>
               )
             )}
           </div>
-          
+
           {/* Event Tags - At Bottom */}
-          <div className="border-t border-gray-100 pt-2">
+          <div className="border-t border-gray-100 pt-3 pb-0">
             {event.tags && event.tags.length > 0 ? (
               <div className="flex flex-wrap gap-1">
                 {event.tags.slice(0, 3).map((tag, index) => (

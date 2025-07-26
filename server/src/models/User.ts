@@ -6,20 +6,23 @@ export interface IUser extends Document {
   role: 'admin' | 'user';
   avatar?: string;
   password?: string; // hashed in real implementation
+  phone?: string;
+  dateOfBirth?: string;
+  location?: string;
 }
 
 const userSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
     role: { type: String, enum: ['admin', 'user'], default: 'user' },
     avatar: { type: String },
     password: { type: String, required: true },
+    phone: { type: String },
+    dateOfBirth: { type: String },
+    location: { type: String },
   },
   { timestamps: true }
 );
-
-// Add unique index for email to prevent duplicates
-userSchema.index({ email: 1 }, { unique: true });
 
 export default model<IUser>('User', userSchema); 

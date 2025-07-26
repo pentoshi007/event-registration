@@ -15,6 +15,7 @@ const HomePage: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -42,10 +43,10 @@ const HomePage: React.FC = () => {
   const [pendingSearchTerm, setPendingSearchTerm] = useState('');
   const [activeSearchTerm, setActiveSearchTerm] = useState('');
   const [featuredEvent, setFeaturedEvent] = useState<Event | null>(null);
-  const [categories, setCategories] = useState<string[]>(['All']);
 
   // Animation refs
   const heroRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
   const eventsRef = useRef<HTMLDivElement>(null);
   const isInitialLoad = useRef(true);
   const location = useLocation();
@@ -53,8 +54,8 @@ const HomePage: React.FC = () => {
 
   // Responsive pagination sizes - Safe window access
   const getInitialLimit = () => {
-    if (typeof window === 'undefined') return 6; // Default for SSR
-    return 6; // Always show 6 events initially
+    if (typeof window === 'undefined') return 7; // Default for SSR
+    return window.innerWidth >= 768 ? 7 : 4; // Desktop: 7 (1+6), Mobile: 4 (1+3)
   };
 
   const getLoadMoreLimit = () => {
@@ -65,7 +66,6 @@ const HomePage: React.FC = () => {
     // Set client-side flag to prevent hydration mismatches
     setIsClient(true);
     loadInitialEvents();
-    loadCategories();
   }, []);
 
   useEffect(() => {
@@ -164,9 +164,6 @@ const HomePage: React.FC = () => {
       setEvents(response.events || []);
       setHasMore(response.pagination.hasMore);
       setNextOffset(response.pagination.nextOffset);
-
-      // Refresh categories in case new ones were added
-      loadCategories();
     } catch (error) {
       console.error('Failed to load events:', error);
       // Use fallback mock data
@@ -200,6 +197,66 @@ const HomePage: React.FC = () => {
           category: 'Business',
           organizer: 'BizLeaders',
           tags: ['Business', 'Leadership', 'Networking']
+        },
+        {
+          _id: '3',
+          title: 'Cultural Fest 2024',
+          description: 'A celebration of art, music, and food from around the world. Enjoy performances, workshops, and more.',
+          date: '2024-05-20',
+          time: '12:00',
+          location: 'Downtown Park',
+          maxAttendees: 800,
+          currentAttendees: 650,
+          price: 49,
+          image: 'https://www.liysf.org.uk/wp-content/uploads/2019/01/61st-LIYSF-2019-120.jpg',
+          category: 'Cultural',
+          organizer: 'CultureConnect',
+          tags: ['Culture', 'Music', 'Food', 'Art']
+        },
+        {
+          _id: '4',
+          title: 'Sports Mania',
+          description: 'Participate in or watch exciting sports tournaments and matches. Fun for all ages!',
+          date: '2024-06-05',
+          time: '08:00',
+          location: 'City Sports Arena',
+          maxAttendees: 400,
+          currentAttendees: 320,
+          price: 99,
+          image: 'https://images.pexels.com/photos/399187/pexels-photo-399187.jpeg?auto=compress&fit=crop&w=800&q=80',
+          category: 'Sports',
+          organizer: 'SportsWorld',
+          tags: ['Sports', 'Tournament', 'Fun']
+        },
+        {
+          _id: '5',
+          title: 'Charity Gala Night',
+          description: 'Join us for an evening of giving back. All proceeds go to local charities. Includes dinner and entertainment.',
+          date: '2024-07-12',
+          time: '19:00',
+          location: 'Grand Ballroom',
+          maxAttendees: 250,
+          currentAttendees: 200,
+          price: 150,
+          image: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&fit=crop&w=800&q=80',
+          category: 'Social',
+          organizer: 'HelpingHands',
+          tags: ['Charity', 'Gala', 'Dinner', 'Social']
+        },
+        {
+          _id: '6',
+          title: 'Grand Wedding Expo',
+          description: 'Plan your perfect day! Meet top wedding planners, designers, and vendors all in one place.',
+          date: '2024-08-05',
+          time: '11:00',
+          location: 'Exhibition Palace',
+          maxAttendees: 1000,
+          currentAttendees: 450,
+          price: 25,
+          image: 'https://images.pexels.com/photos/169198/pexels-photo-169198.jpeg?auto=compress&fit=crop&w=800&q=80',
+          category: 'Social',
+          organizer: 'Dream Weddings Co.',
+          tags: ['Wedding', 'Expo', 'Planning', 'Social']
         }
       ];
       setEvents(mockEvents);
@@ -230,8 +287,8 @@ const HomePage: React.FC = () => {
         params.category = selectedCategory;
       }
 
-      if (activeSearchTerm.trim()) {
-        params.search = activeSearchTerm.trim();
+      if (searchTerm.trim()) {
+        params.search = searchTerm.trim();
       }
 
       const response: PaginationResponse<Event> = await api.getEvents(params);
@@ -257,19 +314,7 @@ const HomePage: React.FC = () => {
     }
   };
 
-  // Load categories from API
-  const loadCategories = async () => {
-    try {
-      const response = await api.getCategories();
-      if (response.success && response.categories) {
-        setCategories(['All', ...response.categories]);
-      }
-    } catch (error) {
-      console.error('Failed to load categories:', error);
-      // Fallback to basic categories if API fails
-      setCategories(['All', 'Technology', 'Business', 'Marketing', 'Design', 'Education']);
-    }
-  };
+  const categories = ['All', 'Technology', 'Business', 'Marketing', 'Design', 'Education', 'Arts', 'Health', 'Sports', 'Music', 'Science', 'Travel', 'Food', 'Finance', 'Environment', 'Social'];
 
   const handleRegister = async (eventId: string) => {
     const event = events.find(e => e._id === eventId);
@@ -397,6 +442,10 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden" style={{ backgroundImage: `url(${hpBG})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      {/* Decorative SVG Blob */}
+      {/* <svg className="absolute top-0 left-0 w-96 h-96 opacity-20 blur-2xl pointer-events-none z-0" viewBox="0 0 200 200">
+        <path fill="#60a5fa" d="M40,-60C55,-50,70,-40,75,-25C80,-10,75,10,65,25C55,40,40,50,25,60C10,70,-10,75,-25,70C-40,65,-50,50,-60,35C-70,20,-75,0,-70,-20C-65,-40,-50,-55,-35,-65C-20,-75,0,-80,20,-75C40,-70,55,-60,40,-60Z" transform="translate(100 100)" />
+      </svg> */}
       {/* Enhanced Tagline & Search Section */}
       <div ref={heroRef} className="pt-20 pb-12 text-center animate-on-scroll relative z-10" style={{ backgroundImage: `url(${hpBG})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
         <div className="max-w-4xl mx-auto px-4 relative z-10">
@@ -406,7 +455,6 @@ const HomePage: React.FC = () => {
           <p className="text-xl md:text-2xl text-green-50 mb-8 max-w-2xl mx-auto animate-fade-in-delay">
             Be part of a growing community of professionals and learners, coming together through events that inspire, educate, and connect lives.
           </p>
-
           {/* Animated Event Images Grid */}
           <div className="relative z-10 mt-8 mb-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 w-full max-w-3xl mx-auto animate-fade-in-up">
             {/* 1. Live Concert */}
@@ -420,7 +468,6 @@ const HomePage: React.FC = () => {
             {/* 5. Business & Professional Events */}
             <img src="https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg?auto=compress&fit=crop&w=300&q=80" alt="Business & Professional Events" className="w-24 h-24 md:w-28 md:h-28 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-400" />
           </div>
-
           {/* Search and Filter */}
           <div className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100/80 backdrop-blur-md rounded-xl border border-blue-200 shadow-xl p-6 mb-4 animate-on-scroll">
             <div className="flex flex-col md:flex-row gap-4 items-center">
@@ -458,7 +505,6 @@ const HomePage: React.FC = () => {
               </div>
             </div>
           </div>
-
           {/* About Paragraph: Below search bar */}
           <div className="flex justify-center mt-4 mb-4 animate-on-scroll">
             <p className="max-w-2xl w-full text-center text-lg md:text-xl text-green-50 font-medium mx-auto">
@@ -473,63 +519,63 @@ const HomePage: React.FC = () => {
         <h2 className="text-2xl md:text-3xl font-bold text-white mb-8 text-center">Explore Event Categories</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Learning & Innovation */}
-          <div className="rounded-2xl bg-blue-200 text-gray-900 shadow-xl p-6 flex flex-col transition-all duration-300 ease-out hover:shadow-2xl hover:scale-105 hover:-translate-y-2 hover:bg-blue-300 cursor-pointer group">
-            <h3 className="text-xl font-bold mb-2 group-hover:text-blue-900 transition-colors duration-300">Learning & Innovation <span className='text-blue-600 group-hover:text-blue-800 transition-colors duration-300'>(Workshops, Tech, Webinars, Hackathons)</span></h3>
-            <p className="mb-3 text-blue-800 group-hover:text-blue-900 transition-colors duration-300">Workshops, tech conferences, webinars, and hackathons to boost your skills and spark innovation.</p>
-            <ul className="list-disc list-inside text-blue-700 group-hover:text-blue-800 text-sm space-y-1 pl-2 transition-colors duration-300">
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300">Python Bootcamp</li>
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300 delay-75">AI & ML Summit</li>
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300 delay-150">24hr Coding Challenge</li>
+          <div className="rounded-2xl bg-blue-200 text-gray-900 shadow-xl p-6 flex flex-col transition-all duration-200 hover:shadow-2xl">
+            <h3 className="text-xl font-bold mb-2">Learning & Innovation <span className='text-blue-600'>(Workshops, Tech, Webinars, Hackathons)</span></h3>
+            <p className="mb-3 text-blue-800">Workshops, tech conferences, webinars, and hackathons to boost your skills and spark innovation.</p>
+            <ul className="list-disc list-inside text-blue-700 text-sm space-y-1 pl-2">
+              <li>Python Bootcamp</li>
+              <li>AI & ML Summit</li>
+              <li>24hr Coding Challenge</li>
             </ul>
           </div>
           {/* Business & Professional Events */}
-          <div className="rounded-2xl bg-green-200 text-gray-900 shadow-xl p-6 flex flex-col transition-all duration-300 ease-out hover:shadow-2xl hover:scale-105 hover:-translate-y-2 hover:bg-green-300 cursor-pointer group">
-            <h3 className="text-xl font-bold mb-2 group-hover:text-green-900 transition-colors duration-300">Business & Professional Events <span className='text-green-600 group-hover:text-green-800 transition-colors duration-300'>(Business, Startup, Networking)</span></h3>
-            <p className="mb-3 text-green-800 group-hover:text-green-900 transition-colors duration-300">Connect, network, and grow with top business minds and leaders.</p>
-            <ul className="list-disc list-inside text-green-700 group-hover:text-green-800 text-sm space-y-1 pl-2 transition-colors duration-300">
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300">Entrepreneurship Summit</li>
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300 delay-75">Investor Meet</li>
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300 delay-150">Leadership Workshop</li>
+          <div className="rounded-2xl bg-green-200 text-gray-900 shadow-xl p-6 flex flex-col transition-all duration-200 hover:shadow-2xl">
+            <h3 className="text-xl font-bold mb-2">Business & Professional Events <span className='text-green-600'>(Business, Startup, Networking)</span></h3>
+            <p className="mb-3 text-green-800">Connect, network, and grow with top business minds and leaders.</p>
+            <ul className="list-disc list-inside text-green-700 text-sm space-y-1 pl-2">
+              <li>Entrepreneurship Summit</li>
+              <li>Investor Meet</li>
+              <li>Leadership Workshop</li>
             </ul>
           </div>
           {/* Cultural Festivals (Cultural) */}
-          <div className="rounded-2xl bg-yellow-200 text-gray-900 shadow-xl p-6 flex flex-col transition-all duration-300 ease-out hover:shadow-2xl hover:scale-105 hover:-translate-y-2 hover:bg-yellow-300 cursor-pointer group">
-            <h3 className="text-xl font-bold mb-2 group-hover:text-yellow-900 transition-colors duration-300">Cultural Festivals <span className='text-yellow-600 group-hover:text-yellow-800 transition-colors duration-300'>(Cultural)</span></h3>
-            <p className="mb-3 text-yellow-800 group-hover:text-yellow-900 transition-colors duration-300">Celebrate diversity and traditions with vibrant festivals.</p>
-            <ul className="list-disc list-inside text-yellow-700 group-hover:text-yellow-800 text-sm space-y-1 pl-2 transition-colors duration-300">
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300">Spring Music Fest</li>
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300 delay-75">Food & Art Carnival</li>
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300 delay-150">International Dance Gala</li>
+          <div className="rounded-2xl bg-yellow-200 text-gray-900 shadow-xl p-6 flex flex-col transition-all duration-200 hover:shadow-2xl">
+            <h3 className="text-xl font-bold mb-2">Cultural Festivals <span className='text-yellow-600'>(Cultural)</span></h3>
+            <p className="mb-3 text-yellow-800">Celebrate diversity and traditions with vibrant festivals.</p>
+            <ul className="list-disc list-inside text-yellow-700 text-sm space-y-1 pl-2">
+              <li>Spring Music Fest</li>
+              <li>Food & Art Carnival</li>
+              <li>International Dance Gala</li>
             </ul>
           </div>
           {/* Entertainment Events */}
-          <div className="rounded-2xl bg-pink-200 text-gray-900 shadow-xl p-6 flex flex-col transition-all duration-300 ease-out hover:shadow-2xl hover:scale-105 hover:-translate-y-2 hover:bg-pink-300 cursor-pointer group">
-            <h3 className="text-xl font-bold mb-2 group-hover:text-pink-900 transition-colors duration-300">Entertainment Events <span className='text-pink-600 group-hover:text-pink-800 transition-colors duration-300'>(Concerts, Stand-up, Movies)</span></h3>
-            <p className="mb-3 text-pink-800 group-hover:text-pink-900 transition-colors duration-300">Enjoy concerts, stand-up comedy, movie nights, and more fun-filled events.</p>
-            <ul className="list-disc list-inside text-pink-700 group-hover:text-pink-800 text-sm space-y-1 pl-2 transition-colors duration-300">
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300">Live Concert</li>
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300 delay-75">Stand-up Night</li>
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300 delay-150">Open Air Movie</li>
+          <div className="rounded-2xl bg-pink-200 text-gray-900 shadow-xl p-6 flex flex-col transition-all duration-200 hover:shadow-2xl">
+            <h3 className="text-xl font-bold mb-2">Entertainment Events <span className='text-pink-600'>(Concerts, Stand-up, Movies)</span></h3>
+            <p className="mb-3 text-pink-800">Enjoy concerts, stand-up comedy, movie nights, and more fun-filled events.</p>
+            <ul className="list-disc list-inside text-pink-700 text-sm space-y-1 pl-2">
+              <li>Live Concert</li>
+              <li>Stand-up Night</li>
+              <li>Open Air Movie</li>
             </ul>
           </div>
           {/* Sports Events */}
-          <div className="rounded-2xl bg-indigo-200 text-gray-900 shadow-xl p-6 flex flex-col transition-all duration-300 ease-out hover:shadow-2xl hover:scale-105 hover:-translate-y-2 hover:bg-indigo-300 cursor-pointer group">
-            <h3 className="text-xl font-bold mb-2 group-hover:text-indigo-900 transition-colors duration-300">Sports Events <span className='text-indigo-600 group-hover:text-indigo-800 transition-colors duration-300'>(Tournaments, Matches)</span></h3>
-            <p className="mb-3 text-indigo-800 group-hover:text-indigo-900 transition-colors duration-300">Participate in or watch exciting sports tournaments and matches.</p>
-            <ul className="list-disc list-inside text-indigo-700 group-hover:text-indigo-800 text-sm space-y-1 pl-2 transition-colors duration-300">
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300">Intercollege Sports Meet</li>
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300 delay-75">Football Tournament</li>
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300 delay-150">Cricket League</li>
+          <div className="rounded-2xl bg-indigo-200 text-gray-900 shadow-xl p-6 flex flex-col transition-all duration-200 hover:shadow-2xl">
+            <h3 className="text-xl font-bold mb-2">Sports Events <span className='text-green-600'>(Tournaments, Matches)</span></h3>
+            <p className="mb-3 text-green-800">Participate in or watch exciting sports tournaments and matches.</p>
+            <ul className="list-disc list-inside text-green-700 text-sm space-y-1 pl-2">
+              <li>Intercollege Sports Meet</li>
+              <li>Football Tournament</li>
+              <li>Cricket League</li>
             </ul>
           </div>
           {/* Social & Community Events */}
-          <div className="rounded-2xl bg-purple-200 text-gray-900 shadow-xl p-6 flex flex-col transition-all duration-300 ease-out hover:shadow-2xl hover:scale-105 hover:-translate-y-2 hover:bg-purple-300 cursor-pointer group">
-            <h3 className="text-xl font-bold mb-2 group-hover:text-purple-900 transition-colors duration-300">Social & Community Events <span className='text-purple-600 group-hover:text-purple-800 transition-colors duration-300'>(Charity, Meetups)</span></h3>
-            <p className="mb-3 text-purple-800 group-hover:text-purple-900 transition-colors duration-300">Join hands for a cause or connect with your community through social events.</p>
-            <ul className="list-disc list-inside text-purple-700 group-hover:text-purple-800 text-sm space-y-1 pl-2 transition-colors duration-300">
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300">Charity Run</li>
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300 delay-75">Community Meetup</li>
-              <li className="transform group-hover:translate-x-1 transition-transform duration-300 delay-150">Blood Donation Camp</li>
+          <div className="rounded-2xl bg-purple-200 text-gray-900 shadow-xl p-6 flex flex-col transition-all duration-200 hover:shadow-2xl">
+            <h3 className="text-xl font-bold mb-2">Social & Community Events <span className='text-indigo-600'>(Charity, Meetups)</span></h3>
+            <p className="mb-3 text-indigo-800">Join hands for a cause or connect with your community through social events.</p>
+            <ul className="list-disc list-inside text-indigo-700 text-sm space-y-1 pl-2">
+              <li>Charity Run</li>
+              <li>Community Meetup</li>
+              <li>Blood Donation Camp</li>
             </ul>
           </div>
         </div>
@@ -548,7 +594,7 @@ const HomePage: React.FC = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <h3 className="text-2xl lg:text-3xl font-bold mb-2">{featuredEvent.title}</h3>
-                    <span className="inline-block bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium mb-2">
+                    <span className="inline-block bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium">
                       {featuredEvent.category}
                     </span>
                   </div>
@@ -614,7 +660,7 @@ const HomePage: React.FC = () => {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {events.map((event) => (
+              {events.slice(0, 9).map((event) => (
                 <div key={event._id} className="event-card animate-on-scroll">
                   <EventCard event={event} onRegister={() => handleRegister(event._id)} showRegisterButton={true} />
                 </div>
@@ -646,6 +692,31 @@ const HomePage: React.FC = () => {
           </>
         )}
       </div>
+
+      {/* Stats Blocks: Second page section above event cards */}
+      <section className="flex justify-center items-center mt-12 mb-12 animate-on-scroll">
+        <div className="relative w-full max-w-4xl px-2 md:px-0">
+          {/* Bold Blue gradient background bar */}
+          <div className="absolute inset-0 h-full w-full rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-blue-700 opacity-90" style={{ zIndex: 0 }}></div>
+          <div className="relative flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-12 p-8 sm:p-12" style={{ zIndex: 1 }}>
+            <div className="bg-white/95 rounded-xl border-2 border-blue-200 shadow-lg flex flex-col items-center justify-center w-full sm:w-64 h-32 text-center px-4 py-4">
+              <Calendar className="h-10 w-10 text-blue-600 mb-2" />
+              <div className="text-2xl font-extrabold text-blue-700 leading-tight">10,000+</div>
+              <div className="text-gray-600 text-base font-medium">Events Hosted</div>
+            </div>
+            <div className="bg-white/95 rounded-xl border-2 border-green-200 shadow-lg flex flex-col items-center justify-center w-full sm:w-64 h-32 text-center px-4 py-4">
+              <Users className="h-10 w-10 text-green-600 mb-2" />
+              <div className="text-2xl font-extrabold text-green-700 leading-tight">50K+</div>
+              <div className="text-gray-600 text-base font-medium">Happy Attendees</div>
+            </div>
+            <div className="bg-white/95 rounded-xl border-2 border-yellow-200 shadow-lg flex flex-col items-center justify-center w-full sm:w-64 h-32 text-center px-4 py-4">
+              <Star className="h-10 w-10 text-yellow-500 mb-2" />
+              <div className="text-2xl font-extrabold text-yellow-600 leading-tight">4.9</div>
+              <div className="text-gray-600 text-base font-medium">Average Rating</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Registration Modal */}
       {showRegisterModal && selectedEvent && (
@@ -859,4 +930,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage;
+export default HomePage; 

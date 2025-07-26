@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { api } from '../api';
 
 const ChangePasswordPage: React.FC = () => {
   const [form, setForm] = useState({
@@ -8,6 +9,7 @@ const ChangePasswordPage: React.FC = () => {
   });
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -15,13 +17,41 @@ const ChangePasswordPage: React.FC = () => {
     setError('');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setSuccess(false);
+
     if (form.newPass !== form.confirm) {
       setError('New passwords do not match');
       return;
     }
-    setSuccess(true);
+
+    if (form.newPass.length < 6) {
+      setError('New password must be at least 6 characters long');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await api.changePassword({
+        currentPassword: form.current,
+        newPassword: form.newPass
+      });
+
+      if (response.success) {
+        setSuccess(true);
+        setForm({ current: '', newPass: '', confirm: '' });
+        // Hide success message after 3 seconds
+        setTimeout(() => setSuccess(false), 3000);
+      }
+    } catch (error: any) {
+      console.error('Failed to change password:', error);
+      setError(error.message || 'Failed to change password. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -52,7 +82,20 @@ const ChangePasswordPage: React.FC = () => {
             <input name="confirm" type="password" value={form.confirm} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-400" placeholder="Confirm New Password" required />
           </div>
           <div className="flex justify-center">
-            <button type="submit" className="w-full max-w-xs bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded-lg transition-all">Change Password</button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full max-w-xs bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-semibold py-2 rounded-lg transition-all disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Changing...
+                </>
+              ) : (
+                'Change Password'
+              )}
+            </button>
           </div>
         </form>
         {error && <div className="mt-4 text-red-600 text-center font-medium">{error}</div>}

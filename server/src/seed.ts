@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import Event from './models/Event.js';
 import User from './models/User.js';
@@ -141,14 +142,22 @@ const mockUsers = [
   {
     name: 'Admin User',
     email: 'admin@evently.com',
+    password: 'admin123',
     role: 'admin',
-    avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=150'
+    avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+1-555-0001',
+    dateOfBirth: '1990-01-01',
+    location: 'San Francisco, CA'
   },
   {
     name: 'Regular User',
     email: 'user@evently.com',
+    password: 'user123',
     role: 'user',
-    avatar: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=150'
+    avatar: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=150',
+    phone: '+1-555-0002',
+    dateOfBirth: '1995-05-15',
+    location: 'New York, NY'
   }
 ];
 
@@ -210,19 +219,19 @@ async function connectDB() {
 async function seedEvents() {
   try {
     console.log('Seeding events...');
-    
+
     for (const eventData of mockEvents) {
       await Event.findOneAndUpdate(
         { title: eventData.title }, // Find by title
         eventData, // Update with this data
-        { 
+        {
           upsert: true, // Create if doesn't exist
           new: true, // Return the updated document
           setDefaultsOnInsert: true // Set default values on insert
         }
       );
     }
-    
+
     console.log(`✅ Seeded ${mockEvents.length} events successfully`);
   } catch (error) {
     console.error('Error seeding events:', error);
@@ -232,19 +241,27 @@ async function seedEvents() {
 async function seedUsers() {
   try {
     console.log('Seeding users...');
-    
+
     for (const userData of mockUsers) {
-      await User.findOneAndUpdate(
-        { email: userData.email }, // Find by email
-        userData, // Update with this data
-        { 
-          upsert: true, // Create if doesn't exist
-          new: true, // Return the updated document
-          setDefaultsOnInsert: true // Set default values on insert
-        }
-      );
+      // Check if user already exists
+      const existingUser = await User.findOne({ email: userData.email });
+
+      if (!existingUser) {
+        // Hash password before saving
+        const hashedPassword = await bcrypt.hash(userData.password, 10);
+
+        const userToSave = {
+          ...userData,
+          password: hashedPassword
+        };
+
+        await User.create(userToSave);
+        console.log(`✅ Created user: ${userData.email}`);
+      } else {
+        console.log(`ℹ️  User already exists: ${userData.email}`);
+      }
     }
-    
+
     console.log(`✅ Seeded ${mockUsers.length} users successfully`);
   } catch (error) {
     console.error('Error seeding users:', error);
@@ -254,30 +271,30 @@ async function seedUsers() {
 async function seedRegistrations() {
   try {
     console.log('Seeding registrations...');
-    
+
     // Get event IDs to associate registrations
     const events = await Event.find({});
-    
+
     for (let i = 0; i < mockRegistrations.length && i < events.length; i++) {
       const registrationData = {
         ...mockRegistrations[i],
         eventId: events[i % events.length]._id // Cycle through events
       };
-      
+
       await Registration.findOneAndUpdate(
-        { 
+        {
           attendeeEmail: registrationData.attendeeEmail,
           eventId: registrationData.eventId
         }, // Find by email and event
         registrationData, // Update with this data
-        { 
+        {
           upsert: true, // Create if doesn't exist
           new: true, // Return the updated document
           setDefaultsOnInsert: true // Set default values on insert
         }
       );
     }
-    
+
     console.log(`✅ Seeded ${mockRegistrations.length} registrations successfully`);
   } catch (error) {
     console.error('Error seeding registrations:', error);
@@ -287,23 +304,23 @@ async function seedRegistrations() {
 async function seedDatabase() {
   try {
     await connectDB();
-    
+
     await seedEvents();
     await seedUsers();
     await seedRegistrations();
-    
+
     console.log('🎉 Database seeded successfully with bolt project data!');
-    
+
     // Show stats
     const eventCount = await Event.countDocuments();
     const userCount = await User.countDocuments();
     const registrationCount = await Registration.countDocuments();
-    
+
     console.log(`📊 Database Stats:`);
     console.log(`   Events: ${eventCount}`);
     console.log(`   Users: ${userCount}`);
     console.log(`   Registrations: ${registrationCount}`);
-    
+
   } catch (error) {
     console.error('❌ Error seeding database:', error);
   } finally {
@@ -317,7 +334,7 @@ export async function needsSeeding() {
   try {
     const eventCount = await Event.countDocuments();
     const userCount = await User.countDocuments();
-    
+
     // If both events and users collections are empty, we need seeding
     return eventCount === 0 && userCount === 0;
   } catch (error) {
@@ -331,18 +348,18 @@ export async function autoSeed() {
   try {
     if (await needsSeeding()) {
       console.log('🌱 Database is empty, auto-seeding...');
-      
+
       await seedEvents();
       await seedUsers();
       await seedRegistrations();
-      
+
       console.log('🎉 Auto-seeding completed successfully!');
-      
+
       // Show stats
       const eventCount = await Event.countDocuments();
       const userCount = await User.countDocuments();
       const registrationCount = await Registration.countDocuments();
-      
+
       console.log(`📊 Database Stats:`);
       console.log(`   Events: ${eventCount}`);
       console.log(`   Users: ${userCount}`);
@@ -359,23 +376,23 @@ export async function autoSeed() {
 async function manualSeedDatabase() {
   try {
     await connectDB();
-    
+
     await seedEvents();
     await seedUsers();
     await seedRegistrations();
-    
+
     console.log('🎉 Manual seeding completed successfully!');
-    
+
     // Show stats
     const eventCount = await Event.countDocuments();
     const userCount = await User.countDocuments();
     const registrationCount = await Registration.countDocuments();
-    
+
     console.log(`📊 Database Stats:`);
     console.log(`   Events: ${eventCount}`);
     console.log(`   Users: ${userCount}`);
     console.log(`   Registrations: ${registrationCount}`);
-    
+
   } catch (error) {
     console.error('❌ Error seeding database:', error);
   } finally {

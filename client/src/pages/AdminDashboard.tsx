@@ -14,6 +14,27 @@ const AdminDashboard: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [analytics, setAnalytics] = useState<{
+    totals: {
+      events: number;
+      registrations: number;
+      revenue: number;
+      avgAttendance: number;
+    };
+    monthlyData: Array<{
+      name: string;
+      events: number;
+      revenue: number;
+      registrations: number;
+    }>;
+    categoryData: Array<{
+      name: string;
+      value: number;
+    }>;
+  } | null>(null);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [showCustomCategory, setShowCustomCategory] = useState(false);
+  const [customCategory, setCustomCategory] = useState('');
   const [eventForm, setEventForm] = useState({
     title: '',
     description: '',
@@ -29,78 +50,113 @@ const AdminDashboard: React.FC = () => {
   });
 
   useEffect(() => {
-    loadEvents();
+    loadData();
+    loadCategories();
   }, []);
 
-  const loadEvents = async () => {
+  // Load categories from API
+  const loadCategories = async () => {
+    try {
+      const response = await api.getCategories();
+      if (response.success && response.categories) {
+        setCategories(response.categories);
+      }
+    } catch (error) {
+      console.error('Failed to load categories:', error);
+      // Fallback to basic categories if API fails
+      setCategories(['Technology', 'Business', 'Marketing', 'Design', 'Education', 'Arts']);
+    }
+  };
+
+  const loadData = async () => {
     try {
       setLoading(true);
-      const response = await api.getEvents();
-      // Handle the API response structure: {events: [...], pagination: {...}}
-      const events = response?.events || response || [];
+      // Load both events and analytics data
+      const [eventsResponse, analyticsResponse] = await Promise.all([
+        api.getEvents(),
+        api.getAnalytics()
+      ]);
+
+      // Handle events
+      const events = eventsResponse?.events || eventsResponse || [];
       setEvents(Array.isArray(events) ? events : []);
+
+      // Handle analytics
+      if (analyticsResponse.success) {
+        setAnalytics(analyticsResponse.analytics);
+      }
     } catch (error) {
-      console.error('Failed to load events:', error);
-      // Fallback data if API fails
+      console.error('Failed to load data:', error);
       setEvents([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const totalEvents = events.length;
-  const totalAttendees = events.reduce((sum, event) => sum + event.currentAttendees, 0);
-  const totalRevenue = events.reduce((sum, event) => sum + (event.currentAttendees * event.price), 0);
-  const avgAttendance = totalEvents > 0 ? Math.round(totalAttendees / totalEvents) : 0;
+  // Use analytics data if available, otherwise calculate from events
+  const totalEvents = analytics?.totals.events || events.length;
+  const totalAttendees = analytics?.totals.registrations || events.reduce((sum, event) => sum + event.currentAttendees, 0);
+  const totalRevenue = analytics?.totals.revenue || events.reduce((sum, event) => sum + (event.currentAttendees * event.price), 0);
+  const avgAttendance = analytics?.totals.avgAttendance || (totalEvents > 0 ? Math.round(totalAttendees / totalEvents) : 0);
 
-  const categoryData = events.reduce((acc, event) => {
-    acc[event.category] = (acc[event.category] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const pieData = Object.entries(categoryData).map(([category, count]) => ({
+  // Use analytics category data if available, otherwise calculate from events
+  const pieData = analytics?.categoryData || Object.entries(
+    events.reduce((acc, event) => {
+      acc[event.category] = (acc[event.category] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>)
+  ).map(([category, count]) => ({
     name: category,
     value: count
   }));
 
-  // --- MONTHLY DATA: Now includes all months Jan-Dec for full year overview ---
-  const monthlyData = [
-    { name: 'Jan', events: 12, revenue: 15000 },
-    { name: 'Feb', events: 19, revenue: 22000 },
-    { name: 'Mar', events: 15, revenue: 18000 },
-    { name: 'Apr', events: 22, revenue: 28000 },
-    { name: 'May', events: 18, revenue: 25000 },
-    { name: 'Jun', events: 25, revenue: 32000 },
-    { name: 'Jul', events: 20, revenue: 27000 },
-    { name: 'Aug', events: 17, revenue: 21000 },
-    { name: 'Sep', events: 23, revenue: 29000 },
-    { name: 'Oct', events: 21, revenue: 26000 },
-    { name: 'Nov', events: 16, revenue: 20000 },
-    { name: 'Dec', events: 24, revenue: 31000 },
+  // Use analytics monthly data if available, otherwise use fallback
+  const monthlyData = analytics?.monthlyData || [
+    { name: 'Jan', events: 0, revenue: 0, registrations: 0 },
+    { name: 'Feb', events: 0, revenue: 0, registrations: 0 },
+    { name: 'Mar', events: 0, revenue: 0, registrations: 0 },
+    { name: 'Apr', events: 0, revenue: 0, registrations: 0 },
+    { name: 'May', events: 0, revenue: 0, registrations: 0 },
+    { name: 'Jun', events: 0, revenue: 0, registrations: 0 },
+    { name: 'Jul', events: 0, revenue: 0, registrations: 0 },
+    { name: 'Aug', events: 0, revenue: 0, registrations: 0 },
+    { name: 'Sep', events: 0, revenue: 0, registrations: 0 },
+    { name: 'Oct', events: 0, revenue: 0, registrations: 0 },
+    { name: 'Nov', events: 0, revenue: 0, registrations: 0 },
+    { name: 'Dec', events: 0, revenue: 0, registrations: 0 },
   ];
 
   const COLORS = ['#2563EB', '#7C3AED', '#059669', '#DC2626', '#EA580C', '#DB2777'];
 
-  const handleCreateEvent = (e: React.FormEvent) => {
+  const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newEvent: Event = {
-      _id: (Date.now()).toString(),
-      title: eventForm.title,
-      description: eventForm.description,
-      date: eventForm.date,
-      time: eventForm.time,
-      location: eventForm.location,
-      maxAttendees: parseInt(eventForm.maxAttendees),
-      currentAttendees: 0,
-      price: parseFloat(eventForm.price),
-      category: eventForm.category,
-      image: eventForm.image || 'https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg?auto=compress&cs=tinysrgb&w=800',
-      organizer: eventForm.organizer,
-      tags: eventForm.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
-    };
-    setEvents([...events, newEvent]);
-    setShowCreateModal(false);
-    resetForm();
+    try {
+      // Call API to create the event
+      const response = await api.createEvent({
+        title: eventForm.title,
+        description: eventForm.description,
+        date: eventForm.date,
+        time: eventForm.time,
+        location: eventForm.location,
+        maxAttendees: parseInt(eventForm.maxAttendees),
+        price: parseFloat(eventForm.price),
+        category: eventForm.category,
+        image: eventForm.image || 'https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg?auto=compress&cs=tinysrgb&w=800',
+        organizer: eventForm.organizer,
+        tags: eventForm.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+      });
+
+      if (response.success && response.event) {
+        setEvents([...events, response.event]);
+        setShowCreateModal(false);
+        resetForm();
+        // Refresh analytics data and categories
+        loadData();
+        loadCategories();
+      }
+    } catch (error) {
+      console.error('Failed to create event:', error);
+    }
   };
 
   const handleEditEvent = (eventId: string) => {
@@ -124,26 +180,36 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleUpdateEvent = (e: React.FormEvent) => {
+  const handleUpdateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedEvent) {
-      const updatedEvent: Event = {
-        ...selectedEvent,
-        title: eventForm.title,
-        description: eventForm.description,
-        date: eventForm.date,
-        time: eventForm.time,
-        location: eventForm.location,
-        maxAttendees: parseInt(eventForm.maxAttendees),
-        price: parseFloat(eventForm.price),
-        category: eventForm.category,
-        image: eventForm.image,
-        organizer: eventForm.organizer,
-        tags: eventForm.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
-      };
-      setEvents(events.map(event => event._id === selectedEvent._id ? updatedEvent : event));
-      setShowEditModal(false);
-      resetForm();
+      try {
+        // Call API to update the event
+        const response = await api.updateEvent(selectedEvent._id, {
+          title: eventForm.title,
+          description: eventForm.description,
+          date: eventForm.date,
+          time: eventForm.time,
+          location: eventForm.location,
+          maxAttendees: parseInt(eventForm.maxAttendees),
+          price: parseFloat(eventForm.price),
+          category: eventForm.category,
+          image: eventForm.image,
+          organizer: eventForm.organizer,
+          tags: eventForm.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+        });
+
+        if (response.success && response.event) {
+          setEvents(events.map(event => event._id === selectedEvent._id ? response.event : event));
+          setShowEditModal(false);
+          resetForm();
+          // Refresh analytics data and categories
+          loadData();
+          loadCategories();
+        }
+      } catch (error) {
+        console.error('Failed to update event:', error);
+      }
     }
   };
 
@@ -162,12 +228,40 @@ const AdminDashboard: React.FC = () => {
       tags: ''
     });
     setSelectedEvent(null);
+    setShowCustomCategory(false);
+    setCustomCategory('');
+  };
+
+  const handleCategoryChange = (value: string) => {
+    if (value === 'ADD_NEW_CATEGORY') {
+      setShowCustomCategory(true);
+      setEventForm(prev => ({ ...prev, category: '' }));
+    } else {
+      setShowCustomCategory(false);
+      setCustomCategory('');
+      setEventForm(prev => ({ ...prev, category: value }));
+    }
+  };
+
+  const handleCustomCategoryChange = (value: string) => {
+    setCustomCategory(value);
+    setEventForm(prev => ({ ...prev, category: value }));
   };
 
   // Add the delete handler function
-  const handleDeleteEvent = (eventId: string) => {
-    setEvents(events.filter(event => event._id !== eventId));
-    // Optionally, you can also add an API call here to delete from backend
+  const handleDeleteEvent = async (eventId: string) => {
+    try {
+      // Call API to delete the event
+      const response = await api.deleteEvent(eventId);
+
+      if (response.success) {
+        setEvents(events.filter(event => event._id !== eventId));
+        // Refresh analytics data
+        loadData();
+      }
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+    }
   }
 
   if (loading) {
@@ -204,22 +298,22 @@ const AdminDashboard: React.FC = () => {
         <section className="flex justify-center items-center mt-2 mb-8 animate-on-scroll">
           <div className="relative w-full max-w-2xl px-2 md:px-0">
             {/* Subtle Blue gradient background bar */}
-            <div className="absolute inset-0 h-full w-full rounded-xl bg-gradient-to-r from-blue-200 via-blue-100 to-blue-200 opacity-70 blur-[1px]" style={{zIndex: 0}}></div>
-            <div className="relative flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 p-3 sm:p-4" style={{zIndex: 1}}>
+            <div className="absolute inset-0 h-full w-full rounded-xl bg-gradient-to-r from-blue-200 via-blue-100 to-blue-200 opacity-70 blur-[1px]" style={{ zIndex: 0 }}></div>
+            <div className="relative flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 p-3 sm:p-4" style={{ zIndex: 1 }}>
               <div className="bg-white/95 rounded-lg border border-blue-100 shadow flex flex-col items-center justify-center w-full sm:w-40 h-20 text-center px-2 py-2">
                 <Calendar className="h-6 w-6 text-blue-600 mb-1" />
-                <div className="text-lg font-bold text-blue-700 leading-tight">10,000+</div>
+                <div className="text-lg font-bold text-blue-700 leading-tight">{totalEvents}</div>
                 <div className="text-gray-500 text-xs">Events Hosted</div>
               </div>
               <div className="bg-white/95 rounded-lg border border-green-100 shadow flex flex-col items-center justify-center w-full sm:w-40 h-20 text-center px-2 py-2">
                 <Users className="h-6 w-6 text-green-600 mb-1" />
-                <div className="text-lg font-bold text-green-700 leading-tight">50K+</div>
-                <div className="text-gray-500 text-xs">Happy Attendees</div>
+                <div className="text-lg font-bold text-green-700 leading-tight">{totalAttendees}</div>
+                <div className="text-gray-500 text-xs">Total Attendees</div>
               </div>
               <div className="bg-white/95 rounded-lg border border-yellow-100 shadow flex flex-col items-center justify-center w-full sm:w-40 h-20 text-center px-2 py-2">
-                <Star className="h-6 w-6 text-yellow-500 mb-1" />
-                <div className="text-lg font-bold text-yellow-600 leading-tight">4.9</div>
-                <div className="text-gray-500 text-xs">Average Rating</div>
+                <DollarSign className="h-6 w-6 text-yellow-500 mb-1" />
+                <div className="text-lg font-bold text-yellow-600 leading-tight">${totalRevenue.toLocaleString()}</div>
+                <div className="text-gray-500 text-xs">Total Revenue</div>
               </div>
             </div>
           </div>
@@ -270,9 +364,9 @@ const AdminDashboard: React.FC = () => {
                     <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                     <XAxis dataKey="name" stroke="#6B7280" />
                     <YAxis stroke="#6B7280" />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(255,255,255,0.95)', 
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'rgba(255,255,255,0.95)',
                         border: '1px solid #E5E7EB',
                         borderRadius: '8px',
                         backdropFilter: 'blur(16px)',
@@ -304,9 +398,9 @@ const AdminDashboard: React.FC = () => {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'rgba(255,255,255,0.95)', 
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'rgba(255,255,255,0.95)',
                     border: '1px solid #E5E7EB',
                     borderRadius: '8px',
                     backdropFilter: 'blur(16px)',
@@ -369,28 +463,31 @@ const AdminDashboard: React.FC = () => {
                 <div>
                   <label className="block text-gray-700 text-sm font-medium mb-2">Category</label>
                   <select
-                    required
-                    value={eventForm.category}
-                    onChange={(e) => setEventForm(prev => ({ ...prev, category: e.target.value }))}
+                    required={!showCustomCategory}
+                    value={showCustomCategory ? 'ADD_NEW_CATEGORY' : eventForm.category}
+                    onChange={(e) => handleCategoryChange(e.target.value)}
                     className="w-full px-4 py-3 bg-white/80 border border-blue-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md"
                   >
                     <option value="" className="bg-white">Select category</option>
-                    <option value="Technology" className="bg-white">Technology</option>
-                    <option value="Business" className="bg-white">Business</option>
-                    <option value="Marketing" className="bg-white">Marketing</option>
-                    <option value="Design" className="bg-white">Design</option>
-                    <option value="Education" className="bg-white">Education</option>
-                    <option value="Arts" className="bg-white">Arts</option>
-                    <option value="Health" className="bg-white">Health</option>
-                    <option value="Sports" className="bg-white">Sports</option>
-                    <option value="Music" className="bg-white">Music</option>
-                    <option value="Science" className="bg-white">Science</option>
-                    <option value="Travel" className="bg-white">Travel</option>
-                    <option value="Food" className="bg-white">Food</option>
-                    <option value="Finance" className="bg-white">Finance</option>
-                    <option value="Environment" className="bg-white">Environment</option>
-                    <option value="Social" className="bg-white">Social</option>
+                    {categories.map(category => (
+                      <option key={category} value={category} className="bg-white">
+                        {category}
+                      </option>
+                    ))}
+                    <option value="ADD_NEW_CATEGORY" className="bg-blue-50 text-blue-600 font-medium">
+                      ➕ Add New Category
+                    </option>
                   </select>
+                  {showCustomCategory && (
+                    <input
+                      type="text"
+                      required
+                      value={customCategory}
+                      onChange={(e) => handleCustomCategoryChange(e.target.value)}
+                      className="w-full px-4 py-3 bg-white/80 border border-green-200 rounded-lg text-gray-900 placeholder-green-500 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent mt-2 transition-all duration-200 shadow-sm hover:shadow-md"
+                      placeholder="Enter new category name"
+                    />
+                  )}
                 </div>
               </div>
 
@@ -549,19 +646,31 @@ const AdminDashboard: React.FC = () => {
                 <div>
                   <label className="block text-gray-700 text-sm font-medium mb-2">Category</label>
                   <select
-                    required
-                    value={eventForm.category}
-                    onChange={(e) => setEventForm(prev => ({ ...prev, category: e.target.value }))}
+                    required={!showCustomCategory}
+                    value={showCustomCategory ? 'ADD_NEW_CATEGORY' : eventForm.category}
+                    onChange={(e) => handleCategoryChange(e.target.value)}
                     className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="" className="bg-white">Select category</option>
-                    <option value="Technology" className="bg-white">Technology</option>
-                    <option value="Business" className="bg-white">Business</option>
-                    <option value="Marketing" className="bg-white">Marketing</option>
-                    <option value="Design" className="bg-white">Design</option>
-                    <option value="Education" className="bg-white">Education</option>
-                    <option value="Arts" className="bg-white">Arts</option>
+                    {categories.map(category => (
+                      <option key={category} value={category} className="bg-white">
+                        {category}
+                      </option>
+                    ))}
+                    <option value="ADD_NEW_CATEGORY" className="bg-blue-50 text-blue-600 font-medium">
+                      ➕ Add New Category
+                    </option>
                   </select>
+                  {showCustomCategory && (
+                    <input
+                      type="text"
+                      required
+                      value={customCategory}
+                      onChange={(e) => handleCustomCategoryChange(e.target.value)}
+                      className="w-full px-4 py-3 bg-white border border-green-200 rounded-lg text-gray-900 placeholder-green-500 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent mt-2"
+                      placeholder="Enter new category name"
+                    />
+                  )}
                 </div>
               </div>
 

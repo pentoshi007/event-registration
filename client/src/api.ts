@@ -1,4 +1,4 @@
-import type { Event, Registration } from './types';
+import type { Event, Registration, User } from './types';
 
 const API_BASE_URL = '/api';
 
@@ -26,6 +26,8 @@ export interface ApiResponse<T = any> {
   success: boolean;
   message?: string;
   data?: T;
+  user?: User; // For profile updates and auth responses
+  event?: Event; // For event creation/update responses
   registration?: Registration;
   registrations?: Registration[];
   count?: number;
@@ -33,9 +35,14 @@ export interface ApiResponse<T = any> {
 
 async function apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
+
+  // Get token from localStorage
+  const token = localStorage.getItem('token');
+
   const response = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` }),
       ...options.headers,
     },
     ...options,
@@ -58,18 +65,18 @@ export const api = {
     search?: string;
   }): Promise<PaginationResponse<Event>> => {
     const searchParams = new URLSearchParams();
-    
+
     if (params?.limit) searchParams.append('limit', params.limit.toString());
     if (params?.offset) searchParams.append('offset', params.offset.toString());
     if (params?.category) searchParams.append('category', params.category);
     if (params?.search) searchParams.append('search', params.search);
-    
+
     const query = searchParams.toString();
     return apiCall(`/events${query ? `?${query}` : ''}`);
   },
 
   // Get single event
-  getEvent: (id: string) => 
+  getEvent: (id: string) =>
     apiCall(`/events/${id}`),
 
   // Newsletter subscription
@@ -113,4 +120,98 @@ export const api = {
     const query = searchParams.toString();
     return apiCall(`/registrations/event/${eventId}${query ? `?${query}` : ''}`);
   },
+
+  // Get analytics data for admin dashboard
+  getAnalytics: (): Promise<{
+    success: boolean;
+    analytics: {
+      totals: {
+        events: number;
+        registrations: number;
+        revenue: number;
+        avgAttendance: number;
+      };
+      monthlyData: Array<{
+        name: string;
+        events: number;
+        revenue: number;
+        registrations: number;
+      }>;
+      categoryData: Array<{
+        name: string;
+        value: number;
+      }>;
+    };
+  }> => apiCall('/registrations/analytics'),
+
+  // User profile management
+  updateProfile: (data: {
+    name: string;
+    phone?: string;
+    location?: string;
+    dateOfBirth?: string;
+    avatar?: string;
+  }): Promise<ApiResponse> =>
+    apiCall('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  // Change password
+  changePassword: (data: {
+    currentPassword: string;
+    newPassword: string;
+  }): Promise<ApiResponse> =>
+    apiCall('/auth/change-password', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  // Admin event management
+  createEvent: (eventData: {
+    title: string;
+    description: string;
+    date: string;
+    time: string;
+    location: string;
+    maxAttendees: number;
+    price: number;
+    category: string;
+    image: string;
+    organizer: string;
+    tags: string[];
+  }): Promise<ApiResponse> =>
+    apiCall('/events', {
+      method: 'POST',
+      body: JSON.stringify(eventData),
+    }),
+
+  updateEvent: (id: string, eventData: {
+    title: string;
+    description: string;
+    date: string;
+    time: string;
+    location: string;
+    maxAttendees: number;
+    price: number;
+    category: string;
+    image: string;
+    organizer: string;
+    tags: string[];
+  }): Promise<ApiResponse> =>
+    apiCall(`/events/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(eventData),
+    }),
+
+  deleteEvent: (id: string): Promise<ApiResponse> =>
+    apiCall(`/events/${id}`, {
+      method: 'DELETE',
+    }),
+
+  // Get available event categories
+  getCategories: (): Promise<{
+    success: boolean;
+    categories: string[];
+  }> => apiCall('/events/categories'),
 }; 
