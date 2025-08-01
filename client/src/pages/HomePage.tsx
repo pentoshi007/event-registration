@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Search, Filter, Calendar, Users, MapPin, Star, ChevronDown } from 'lucide-react';
+import { Search, Filter, Calendar, Users, MapPin, ChevronDown } from 'lucide-react';
 import EventCard from '../components/EventCard';
 import type { Event } from '../types';
 import { api, PaginationResponse } from '../api';

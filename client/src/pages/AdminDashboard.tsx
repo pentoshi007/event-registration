@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Users, DollarSign, TrendingUp, Plus, Star } from 'lucide-react';
+import { Calendar, Users, DollarSign, TrendingUp, Plus } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import StatsCard from '../components/StatsCard';
 import EventCard from '../components/EventCard';
@@ -200,7 +200,7 @@ const AdminDashboard: React.FC = () => {
         });
 
         if (response.success && response.event) {
-          setEvents(events.map(event => event._id === selectedEvent._id ? response.event : event));
+          setEvents(events.map(event => event._id === selectedEvent._id ? response.event! : event));
           setShowEditModal(false);
           resetForm();
           // Refresh analytics data and categories
@@ -394,7 +394,7 @@ const AdminDashboard: React.FC = () => {
                   fill="#8884d8"
                   dataKey="value"
                 >
-                  {pieData.map((entry, index) => (
+                  {pieData.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>

@@ -31,9 +31,9 @@ const MyEventsPage: React.FC = () => {
     try {
       // Get registrations that match user's email
       const response = await api.matchUserRegistrations(user.email);
-      
+
       if (response.success) {
-        setRegistrations(response.registrations || []);
+        setRegistrations((response.registrations as unknown as PopulatedRegistration[]) || []);
         setMatchedCount(response.count || 0);
       }
     } catch (err: any) {
@@ -89,7 +89,7 @@ const MyEventsPage: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-gray-600 text-lg mb-4">Please sign in to view your events</div>
-          <button 
+          <button
             onClick={() => window.location.href = '/login'}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
           >
@@ -157,7 +157,7 @@ const MyEventsPage: React.FC = () => {
             <p className="text-gray-300 mb-6">
               You haven't registered for any events yet, or no registrations match your email address.
             </p>
-            <button 
+            <button
               onClick={() => window.location.href = '/'}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
             >
@@ -169,9 +169,8 @@ const MyEventsPage: React.FC = () => {
             {registrations.map((registration) => (
               <div
                 key={registration._id}
-                className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-shadow hover:shadow-md ${
-                  isEventPast(registration.eventId.date) ? 'opacity-75' : ''
-                }`}
+                className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-shadow hover:shadow-md ${isEventPast(registration.eventId.date) ? 'opacity-75' : ''
+                  }`}
               >
                 <div className="md:flex">
                   {/* Event Image */}

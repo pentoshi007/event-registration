@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../api';
+import Avatar from '../components/Avatar';
 
 const EditProfilePage: React.FC = () => {
   const { user, isAuthenticated, updateUser } = useAuth();
@@ -119,11 +120,17 @@ const EditProfilePage: React.FC = () => {
             <div className="flex flex-col md:flex-row md:items-center md:gap-6 gap-3">
               <div className="flex flex-col items-center md:items-start flex-shrink-0">
                 <div className="relative w-20 h-20 md:w-24 md:h-24 mb-1">
-                  <img
-                    src={profileImg || 'https://ui-avatars.com/api/?name=User&background=E0E7FF&color=3730A3&size=128'}
-                    alt="Profile Preview"
-                    className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-2 border-blue-200 shadow"
-                  />
+                  {profileImg ? (
+                    <img
+                      src={profileImg}
+                      alt="Profile Preview"
+                      className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-2 border-blue-200 shadow"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 md:w-24 md:h-24">
+                      <Avatar user={user!} size="xl" className="border-blue-200 shadow" />
+                    </div>
+                  )}
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}

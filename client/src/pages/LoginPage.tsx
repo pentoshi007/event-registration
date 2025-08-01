@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import logo from '../logo.png';
+
 import loginBG from './loginBG.png';
 
 const LoginPage: React.FC = () => {
@@ -42,7 +42,7 @@ const LoginPage: React.FC = () => {
 
   const handleDemoLogin = async (role: 'admin' | 'user') => {
     setError('');
-    
+
     const demoCredentials = {
       admin: { email: 'admin@evently.com', password: 'admin123' },
       user: { email: 'user@evently.com', password: 'user123' }
@@ -91,7 +91,7 @@ const LoginPage: React.FC = () => {
                   <span>Login successful! Redirecting...</span>
                 </div>
               )}
-              
+
               {authStatus === 'error' && (
                 <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm animate-fade-in flex items-center space-x-2">
                   <div className="w-5 h-5 border-2 border-red-600 rounded-full flex items-center justify-center animate-scale-in">
@@ -100,7 +100,7 @@ const LoginPage: React.FC = () => {
                   <span>{error || 'Authentication failed'}</span>
                 </div>
               )}
-              
+
               {error && authStatus === 'idle' && (
                 <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm animate-fade-in">
                   {error}
@@ -166,13 +166,12 @@ const LoginPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading || authStatus === 'success'}
-                className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 shadow-lg disabled:cursor-not-allowed transform ${
-                  authStatus === 'success' 
-                    ? 'bg-green-600 hover:bg-green-700 scale-105' 
+                className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 shadow-lg disabled:cursor-not-allowed transform ${authStatus === 'success'
+                    ? 'bg-green-600 hover:bg-green-700 scale-105'
                     : authStatus === 'loading'
-                    ? 'bg-blue-400 scale-95'
-                    : 'bg-blue-600 hover:bg-blue-700 hover:scale-[1.02]'
-                } ${isLoading || authStatus === 'success' ? 'disabled:scale-100' : ''} text-white`}
+                      ? 'bg-blue-400 scale-95'
+                      : 'bg-blue-600 hover:bg-blue-700 hover:scale-[1.02]'
+                  } ${isLoading || authStatus === 'success' ? 'disabled:scale-100' : ''} text-white`}
               >
                 {authStatus === 'loading' ? (
                   <div className="flex items-center justify-center">
@@ -208,9 +207,8 @@ const LoginPage: React.FC = () => {
               <button
                 onClick={() => handleDemoLogin('admin')}
                 disabled={isLoading || authStatus === 'success'}
-                className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-lg text-white transform ${
-                  isLoading ? 'opacity-50 scale-95' : 'hover:scale-105'
-                } ${authStatus === 'success' ? 'bg-green-600' : 'bg-purple-600 hover:bg-purple-700'} disabled:cursor-not-allowed`}
+                className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-lg text-white transform ${isLoading ? 'opacity-50 scale-95' : 'hover:scale-105'
+                  } ${authStatus === 'success' ? 'bg-green-600' : 'bg-purple-600 hover:bg-purple-700'} disabled:cursor-not-allowed`}
               >
                 {authStatus === 'loading' ? (
                   <div className="flex items-center justify-center">
@@ -224,9 +222,8 @@ const LoginPage: React.FC = () => {
               <button
                 onClick={() => handleDemoLogin('user')}
                 disabled={isLoading || authStatus === 'success'}
-                className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-lg text-white transform ${
-                  isLoading ? 'opacity-50 scale-95' : 'hover:scale-105'
-                } ${authStatus === 'success' ? 'bg-green-600' : 'bg-green-600 hover:bg-green-700'} disabled:cursor-not-allowed`}
+                className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-lg text-white transform ${isLoading ? 'opacity-50 scale-95' : 'hover:scale-105'
+                  } ${authStatus === 'success' ? 'bg-green-600' : 'bg-green-600 hover:bg-green-700'} disabled:cursor-not-allowed`}
               >
                 {authStatus === 'loading' ? (
                   <div className="flex items-center justify-center">
