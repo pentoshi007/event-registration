@@ -1,0 +1,23 @@
+{
+  "name": "event-registration",
+  "version": "1.0.0",
+  "description": "A modern, full-stack event registration platform built with React, TypeScript, Node.js, and MongoDB. This application allows users to discover events, register for them, and provides admin functionality for event management. ## ✨ Features",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test:client && npm run test:server",
+    "test:client": "cd client && npm test",
+    "test:server": "cd server && npm test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:all": "npm run test && npm run test:e2e",
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\"",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.54.2",
+    "concurrently": "^9.2.0"
+  }
+}

@@ -154,16 +154,17 @@ npm-debug.log*
 build/
 dist/
 
-# Environment variables - INTENTIONALLY ALLOWING .env FILES
-# .env
-# .env.local
-# .env.development.local
-# .env.test.local
-# .env.production.local
+# Environment variables - SECURITY: IGNORE ALL ENV FILES
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
+!.env.example
 
-# Note: .env files are intentionally NOT ignored because this is a team project
-# and we want to share the database configuration for development purposes.
-# In production, you should use proper environment variable management.
+# Note: .env files contain sensitive information like database credentials
+# and should NEVER be committed to version control
 
 # macOS
 .DS_Store
@@ -182,4 +183,26 @@ ehthumbs.db
 *.ntvs*
 *.njsproj
 *.sln
-*.sw? 
+*.sw?
+
+# Testing
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Logs
+*.log
+logs/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp 
