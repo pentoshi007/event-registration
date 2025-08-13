@@ -36,7 +36,6 @@ export interface ApiResponse<T = any> {
 async function apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
 
-  // Get token from localStorage
   const token = localStorage.getItem('token');
 
   const response = await fetch(url, {
@@ -48,12 +47,35 @@ async function apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<
     ...options,
   });
 
+  const contentType = response.headers.get('content-type') || '';
+  const text = await response.text();
+
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `API call failed: ${response.statusText}`);
+    if (contentType.includes('application/json')) {
+      try {
+        const errorJson = JSON.parse(text);
+        throw new Error(errorJson.message || `API error ${response.status}`);
+      } catch {
+        // fallthrough to text error
+      }
+    }
+    throw new Error(text || `API call failed: ${response.status} ${response.statusText}`);
   }
 
-  return response.json();
+  if (contentType.includes('application/json')) {
+    try {
+      return JSON.parse(text) as T;
+    } catch (e) {
+      throw new Error('Failed to parse JSON response');
+    }
+  }
+
+  // Attempt to parse JSON even if header is wrong, else throw
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new Error(text || 'Unexpected non-JSON response');
+  }
 }
 
 export const api = {
