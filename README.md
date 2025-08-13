@@ -1,5 +1,13 @@
-# 🎉 Eventinity - Event Registration Platform with Admin Dashboard
-A modern, full-stack event registration platform built with React, TypeScript, Node.js, and MongoDB. This application allows users to discover events, register for them, and provides admin functionality for event management.
+# 🎉 Eventinity — Event Discovery & Registration Platform
+
+Eventinity is a full-stack web app to discover, search, and register for events. It ships with authentication, admin tooling, responsive UI, and an API-backed data model. This repo contains both the React client and the Express server.
+
+## 🔑 Demo Credentials
+- Admin: `admin@eventinity.com` / `admin123`
+- Demo User: `user@eventinity.com` / `user123`
+
+> These exist in the seed data and demo fallbacks.
+
 ## ✨ Features
 
 ### User Features
@@ -26,39 +34,24 @@ A modern, full-stack event registration platform built with React, TypeScript, N
 ## 🏗️ Project Structure
 
 ```
-new-project/
-├── client/                 # React Frontend
+event-registration/
+├── client/                 # React + Vite frontend
 │   ├── src/
 │   │   ├── components/     # Reusable UI components
-│   │   │   ├── EventCard.tsx
-│   │   │   ├── Navbar.tsx
-│   │   │   ├── Modal.tsx
-│   │   │   └── ...
-│   │   ├── pages/          # Main application pages
-│   │   │   ├── HomePage.tsx
-│   │   │   ├── LoginPage.tsx
-│   │   │   ├── AdminDashboard.tsx
-│   │   │   └── ...
-│   │   ├── contexts/       # React contexts
-│   │   │   └── AuthContext.tsx
-│   │   ├── api.ts          # API service functions
-│   │   └── types.ts        # TypeScript type definitions
-│   ├── public/             # Static assets
-│   └── package.json
-├── server/                 # Node.js Backend
+│   │   ├── contexts/       # Auth/Theme providers
+│   │   ├── pages/          # Home, Login, Signup, Profile, Admin
+│   │   ├── utils/          # Avatar utils + tests
+│   │   ├── api.ts          # API wrapper
+│   │   └── types.ts        # Shared types
+│   └── ...
+├── server/                 # Express backend
 │   ├── src/
-│   │   ├── models/         # MongoDB schemas
-│   │   │   ├── User.ts
-│   │   │   ├── Event.ts
-│   │   │   └── Registration.ts
-│   │   ├── routes/         # API endpoints
-│   │   │   ├── index.ts
-│   │   │   ├── events.ts
-│   │   │   ├── registrations.ts
-│   │   │   └── newsletter.ts
-│   │   ├── index.ts        # Server entry point
-│   │   └── seed.ts         # Database seeding script
-│   └── package.json
+│   │   ├── models/         # Event, User, Registration, Newsletter
+│   │   ├── routes/         # auth, events, registrations, newsletter
+│   │   ├── index.ts        # Server entry
+│   │   └── seed.ts         # Seed script
+│   └── ...
+├── e2e/                    # Playwright tests
 └── README.md
 ```
 
@@ -89,26 +82,27 @@ new-project/
    ```
 
 3. **Environment Configuration**
-   
-   **📋 Important Note**: The `.env` files are intentionally included in this repository for development convenience. This contains connection details to our shared MongoDB database hosted on MongoDB Atlas.
-   
-   The environment files are already configured with:
-   - MongoDB connection string
-   - JWT secret key
-   - API endpoints
-   
-   **⚠️ Security Note**: In a production environment, these files should never be committed to version control. For this project, we've included them to ensure seamless setup for all team members.
 
-4. **Database Setup (Automatic)**
-   
-   The database will be automatically seeded with sample data when you start the server for the first time. No manual seeding required!
-   
-   **Optional: Manual seeding**
-   ```bash
-   cd server
-   npm run seed        # Manual seed (if you want to re-seed)
-   npm run seed:force  # Force seed (same as above)
-   ```
+Create `server/.env`:
+
+```
+MONGODB_URI=mongodb://localhost:27017/eventinity
+JWT_SECRET=replace-with-secure-secret
+PORT=4000
+```
+
+Create `client/.env`:
+
+```
+VITE_API_BASE_URL=http://localhost:4000/api
+```
+
+4. **Database Seeding** (optional)
+
+```bash
+cd server
+npm run seed
+```
 
 5. **Start the development servers**
 
@@ -128,13 +122,12 @@ new-project/
 
 6. **Access the application**
    - Frontend: `http://localhost:5173`
-   - Backend API: `http://localhost:5001`
+   - Backend API: `http://localhost:4000`
 
-## 🔑 Default Admin Credentials
+## 🔑 Demo/Admin Credentials
 
-For testing admin functionality:
-- **Email**: admin@example.com
-- **Password**: admin123
+- Admin: `admin@eventinity.com` / `admin123`
+- Demo User: `user@eventinity.com` / `user123`
 
 ## 🛠️ Tech Stack
 
@@ -166,7 +159,7 @@ For testing admin functionality:
 - `POST /api/auth/register` - User registration
 
 ### Events
-- `GET /api/events` - Get all events
+- `GET /api/events` - Get events with pagination and filters
 - `POST /api/events` - Create new event (admin only)
 - `PUT /api/events/:id` - Update event (admin only)
 - `DELETE /api/events/:id` - Delete event (admin only)
@@ -266,3 +259,39 @@ This project is developed for educational and collaborative purposes.
 ---
 
 **Built with ❤️ by the Eventinity Team**
+
+## 🔎 Architecture Overview
+
+```mermaid
+flowchart LR
+  User[Browser] --> UI[React UI]
+  UI -->|fetch| API[/Express API/]
+  API --> DB[(MongoDB)]
+  subgraph Client
+    UI --> Ctx[AuthContext]
+  end
+  subgraph Server
+    API --> Auth[JWT Auth]
+    API --> Routes[CRUD Routes]
+  end
+```
+
+## 🔐 Authentication Flow
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant C as Client (React)
+  participant S as Server (Express)
+  participant D as DB (MongoDB)
+
+  U->>C: Submit credentials
+  C->>S: POST /api/auth/login
+  S->>D: Validate user
+  D-->>S: User found
+  S-->>C: { user, token }
+  C->>C: Store token + user in localStorage
+  U->>C: Navigate protected page
+  C->>S: GET /api/auth/verify (Bearer <token>)
+  S-->>C: user payload or 401
+```

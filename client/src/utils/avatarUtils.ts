@@ -31,7 +31,7 @@ export function getFirstCharacter(name: string): string {
  */
 export function getAvatarColor(user: { email: string; role?: string }): { background: string; text: string } {
     // Check if user is admin
-    if (user.role === 'admin' || user.email === 'admin@evently.com') {
+    if (user.role === 'admin' || user.email === 'admin@eventinity.com') {
         return AVATAR_COLORS.admin;
     }
 

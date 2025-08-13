@@ -141,7 +141,7 @@ const mockEvents = [
 const mockUsers = [
   {
     name: 'Admin User',
-    email: 'admin@evently.com',
+    email: 'admin@eventinity.com',
     password: 'admin123',
     role: 'admin',
     avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=150',
@@ -151,7 +151,7 @@ const mockUsers = [
   },
   {
     name: 'Regular User',
-    email: 'user@evently.com',
+    email: 'user@eventinity.com',
     password: 'user123',
     role: 'user',
     avatar: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=150',

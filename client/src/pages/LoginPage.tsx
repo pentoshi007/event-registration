@@ -26,7 +26,7 @@ const LoginPage: React.FC = () => {
         // Add a smooth transition before redirect
         setTimeout(() => {
           // Redirect based on user role
-          if (credentials.email === 'admin@evently.com') {
+          if (credentials.email === 'admin@eventinity.com') {
             navigate('/admin');
           } else {
             navigate('/'); // Redirect all users to homepage
@@ -44,8 +44,8 @@ const LoginPage: React.FC = () => {
     setError('');
 
     const demoCredentials = {
-      admin: { email: 'admin@evently.com', password: 'admin123' },
-      user: { email: 'user@evently.com', password: 'user123' }
+      admin: { email: 'admin@eventinity.com', password: 'admin123' },
+      user: { email: 'user@eventinity.com', password: 'user123' }
     };
 
     try {

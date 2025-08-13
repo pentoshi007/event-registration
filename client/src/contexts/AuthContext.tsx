@@ -93,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         {
           _id: '1',
           name: 'Admin User',
-          email: 'admin@evently.com',
+          email: 'admin@eventinity.com',
           role: 'admin',
           avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=150',
           phone: '+1-555-0001',
@@ -103,7 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         {
           _id: '2',
           name: 'Demo User',
-          email: 'user@evently.com',
+          email: 'user@eventinity.com',
           role: 'user',
           avatar: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=150',
           phone: '+1-555-0002',

@@ -29,7 +29,7 @@ describe('Avatar Utils', () => {
     });
 
     it('returns admin colors for admin email', () => {
-      const user = { email: 'admin@evently.com' };
+      const user = { email: 'admin@eventinity.com' };
       const colors = getAvatarColor(user);
       expect(colors.background).toContain('gradient');
       expect(colors.text).toBe('#FFFFFF');

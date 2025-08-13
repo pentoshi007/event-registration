@@ -40,7 +40,7 @@ test.describe('Authentication Flow', () => {
     await page.goto('/login');
     
     // Use demo credentials that should exist
-    await page.fill('input[type="email"]', 'user@evently.com');
+    await page.fill('input[type="email"]', 'user@eventinity.com');
     await page.fill('input[type="password"]', 'user123');
     
     await page.click('button[type="submit"]');
@@ -70,7 +70,7 @@ test.describe('Authentication Flow', () => {
   test('admin can access admin dashboard', async ({ page }) => {
     // Login as admin
     await page.goto('/login');
-    await page.fill('input[type="email"]', 'admin@evently.com');
+    await page.fill('input[type="email"]', 'admin@eventinity.com');
     await page.fill('input[type="password"]', 'admin123');
     await page.click('button[type="submit"]');
     
@@ -84,7 +84,7 @@ test.describe('Authentication Flow', () => {
   test('regular user cannot access admin dashboard', async ({ page }) => {
     // Login as regular user
     await page.goto('/login');
-    await page.fill('input[type="email"]', 'user@evently.com');
+    await page.fill('input[type="email"]', 'user@eventinity.com');
     await page.fill('input[type="password"]', 'user123');
     await page.click('button[type="submit"]');
     
