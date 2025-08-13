@@ -1,7 +1,7 @@
 {
   "name": "evently-server",
   "version": "1.0.0",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",

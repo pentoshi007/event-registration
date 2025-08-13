@@ -401,9 +401,11 @@ async function manualSeedDatabase() {
   }
 }
 
-// Run the seed function if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  manualSeedDatabase();
+// Run the seed function if this file is executed directly (CommonJS-friendly)
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+if (typeof require !== 'undefined' && require.main === module) {
+  void manualSeedDatabase();
 }
 
 export { seedEvents, seedUsers, seedRegistrations };
