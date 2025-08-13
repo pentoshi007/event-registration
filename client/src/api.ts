@@ -83,6 +83,26 @@ async function apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<
 }
 
 export const api = {
+  // Auth
+  authLogin: (email: string, password: string): Promise<ApiResponse> =>
+    apiCall('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    }),
+
+  authRegister: (data: {
+    name: string;
+    email: string;
+    password: string;
+    phone: string;
+    dateOfBirth: string;
+    location: string;
+  }): Promise<ApiResponse> =>
+    apiCall('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
   // Get events with pagination
   getEvents: (params?: {
     limit?: number;
