@@ -1,6 +1,10 @@
 import type { Event, Registration, User } from './types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+// Resolve API base URL for both local dev and Vercel production
+const ENV_BASE = import.meta.env.VITE_API_BASE_URL as string | undefined;
+const API_BASE_URL = (ENV_BASE && ENV_BASE.trim() !== '')
+  ? ENV_BASE
+  : (import.meta.env.DEV ? '/api' : 'https://13.232.120.38.sslip.io/api');
 
 export interface PaginationResponse<T> {
   events?: T[];
