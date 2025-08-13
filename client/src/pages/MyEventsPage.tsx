@@ -33,8 +33,10 @@ const MyEventsPage: React.FC = () => {
       const response = await api.matchUserRegistrations(user.email);
 
       if (response.success) {
-        setRegistrations((response.registrations as unknown as PopulatedRegistration[]) || []);
-        setMatchedCount(response.count || 0);
+        const raw = (response.registrations as unknown as Array<any>) || [];
+        const filtered = raw.filter(r => r && r.eventId);
+        setRegistrations(filtered as unknown as PopulatedRegistration[]);
+        setMatchedCount(filtered.length);
       }
     } catch (err: any) {
       console.error('Error fetching registrations:', err);
@@ -81,6 +83,7 @@ const MyEventsPage: React.FC = () => {
   };
 
   const isEventPast = (eventDate: string) => {
+    if (!eventDate) return false;
     return new Date(eventDate) < new Date();
   };
 
@@ -167,9 +170,10 @@ const MyEventsPage: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 gap-6">
             {registrations.map((registration) => (
+              registration && (registration as any).eventId ? (
               <div
                 key={registration._id}
-                className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-shadow hover:shadow-md ${isEventPast(registration.eventId.date) ? 'opacity-75' : ''
+                className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-shadow hover:shadow-md ${isEventPast((registration as any).eventId?.date) ? 'opacity-75' : ''
                   }`}
               >
                 <div className="md:flex">
@@ -177,8 +181,8 @@ const MyEventsPage: React.FC = () => {
                   <div className="md:w-48 md:flex-shrink-0">
                     <img
                       className="h-48 w-full object-cover md:h-full md:w-48"
-                      src={registration.eventId.image}
-                      alt={registration.eventId.title}
+                      src={(registration as any).eventId?.image}
+                      alt={(registration as any).eventId?.title}
                     />
                   </div>
 
@@ -188,9 +192,9 @@ const MyEventsPage: React.FC = () => {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <h3 className="text-xl font-bold text-gray-900">
-                            {registration.eventId.title}
+                            {(registration as any).eventId?.title}
                           </h3>
-                          {isEventPast(registration.eventId.date) && (
+                          {isEventPast((registration as any).eventId?.date) && (
                             <span className="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
                               Past Event
                             </span>
@@ -198,7 +202,7 @@ const MyEventsPage: React.FC = () => {
                         </div>
 
                         <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                          {registration.eventId.description}
+                          {(registration as any).eventId?.description}
                         </p>
 
                         {/* Event Info */}
@@ -206,15 +210,15 @@ const MyEventsPage: React.FC = () => {
                           <div className="space-y-2">
                             <div className="flex items-center text-sm text-gray-600">
                               <Calendar className="h-4 w-4 mr-2" />
-                              {formatDate(registration.eventId.date)}
+                              {formatDate((registration as any).eventId?.date)}
                             </div>
                             <div className="flex items-center text-sm text-gray-600">
                               <Clock className="h-4 w-4 mr-2" />
-                              {registration.eventId.time}
+                              {(registration as any).eventId?.time}
                             </div>
                             <div className="flex items-center text-sm text-gray-600">
                               <MapPin className="h-4 w-4 mr-2" />
-                              {registration.eventId.location}
+                              {(registration as any).eventId?.location}
                             </div>
                           </div>
 
@@ -240,7 +244,7 @@ const MyEventsPage: React.FC = () => {
                             <Tag className="h-4 w-4 text-gray-400" />
                             <span className="text-sm text-gray-600">{registration.ticketType}</span>
                             <span className="text-sm font-semibold text-gray-900">
-                              ${registration.eventId.price}
+                              ${((registration as any).eventId?.price) ?? 0}
                             </span>
                           </div>
 
@@ -262,6 +266,7 @@ const MyEventsPage: React.FC = () => {
                   </div>
                 </div>
               </div>
+              ) : null
             ))}
           </div>
         )}
