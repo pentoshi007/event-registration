@@ -55,6 +55,42 @@ event-registration/
 └── README.md
 ```
 
+## 🔎 Architecture Overview
+
+```mermaid
+flowchart LR
+  User[Browser] --> UI[React UI]
+  UI -->|fetch| API[/Express API/]
+  API --> DB[(MongoDB)]
+  subgraph Client
+    UI --> Ctx[AuthContext]
+  end
+  subgraph Server
+    API --> Auth[JWT Auth]
+    API --> Routes[CRUD Routes]
+  end
+```
+
+## 🔐 Authentication Flow
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant C as Client (React)
+  participant S as Server (Express)
+  participant D as DB (MongoDB)
+
+  U->>C: Submit credentials
+  C->>S: POST /api/auth/login
+  S->>D: Validate user
+  D-->>S: User found
+  S-->>C: { user, token }
+  C->>C: Store token + user in localStorage
+  U->>C: Navigate protected page
+  C->>S: GET /api/auth/verify (Bearer <token>)
+  S-->>C: user payload or 401
+```
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -111,7 +147,7 @@ npm run seed
    cd server
    npm run dev
    ```
-   Server will start on `http://localhost:5001`
+   Server will start on `http://localhost:4000`
 
    **Terminal 2 - Frontend Client:**
    ```bash
@@ -259,39 +295,3 @@ This project is developed for educational and collaborative purposes.
 ---
 
 **Built with ❤️ by the Eventinity Team**
-
-## 🔎 Architecture Overview
-
-```mermaid
-flowchart LR
-  User[Browser] --> UI[React UI]
-  UI -->|fetch| API[/Express API/]
-  API --> DB[(MongoDB)]
-  subgraph Client
-    UI --> Ctx[AuthContext]
-  end
-  subgraph Server
-    API --> Auth[JWT Auth]
-    API --> Routes[CRUD Routes]
-  end
-```
-
-## 🔐 Authentication Flow
-
-```mermaid
-sequenceDiagram
-  participant U as User
-  participant C as Client (React)
-  participant S as Server (Express)
-  participant D as DB (MongoDB)
-
-  U->>C: Submit credentials
-  C->>S: POST /api/auth/login
-  S->>D: Validate user
-  D-->>S: User found
-  S-->>C: { user, token }
-  C->>C: Store token + user in localStorage
-  U->>C: Navigate protected page
-  C->>S: GET /api/auth/verify (Bearer <token>)
-  S-->>C: user payload or 401
-```
