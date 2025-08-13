@@ -408,22 +408,38 @@ const HomePage: React.FC = () => {
           </p>
 
           {/* Animated Event Images Grid */}
-          <div className="relative z-10 mt-8 mb-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 w-full max-w-3xl mx-auto animate-fade-in-up">
-            {/* 1. Live Concert */}
-            <img src="https://cdn10.phillymag.com/wp-content/uploads/sites/3/2018/11/live-music-bbt-pavilion-1024x683.jpg" alt="Live Concert" className="w-24 h-24 md:w-28 md:h-28 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in" />
-            {/* 2. Wedding */}
-            <img src="https://eventsbyliz.com.ph/wp-content/uploads/2019/12/The-first-Wedding-Event-at-Acacia-Hotel.-Congratulations-JOKO-amp.xx&oh=2a65ce0fde7916aa6d97a8e3e8d59fb6&oe=5EB3092D.jpeg" alt="Wedding" className="w-24 h-24 md:w-28 md:h-28 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-100" />
-            {/* 3. Student, College & Campus Events */}
-            <img src="https://hcil.umd.edu/wp-content/uploads/2015/08/seminar-conference.jpg" alt="Student, College & Campus Events" className="w-24 h-24 md:w-28 md:h-28 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-200" />
-            {/* 4. Cultural & Social Events */}
-            <img src="https://www.liysf.org.uk/wp-content/uploads/2019/01/61st-LIYSF-2019-120.jpg" alt="Cultural & Social Events" className="w-24 h-24 md:w-28 md:h-28 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-300" />
-            {/* 5. Business & Professional Events */}
-            <img src="https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg?auto=compress&fit=crop&w=300&q=80" alt="Business & Professional Events" className="w-24 h-24 md:w-28 md:h-28 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-400" />
+          <div className="relative z-10 mt-8 mb-8 w-full max-w-3xl mx-auto">
+            {/* Mobile: Cross layout for 5 images */}
+            <div className="grid grid-cols-3 grid-rows-3 gap-3 w-56 mx-auto md:hidden animate-fade-in-up">
+              <div className="row-start-1 col-start-2">
+                <img src="https://cdn10.phillymag.com/wp-content/uploads/sites/3/2018/11/live-music-bbt-pavilion-1024x683.jpg" alt="Live Concert" className="w-16 h-16 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in" />
+              </div>
+              <div className="row-start-2 col-start-1">
+                <img src="https://eventsbyliz.com.ph/wp-content/uploads/2019/12/The-first-Wedding-Event-at-Acacia-Hotel.-Congratulations-JOKO-amp.xx&oh=2a65ce0fde7916aa6d97a8e3e8d59fb6&oe=5EB3092D.jpeg" alt="Wedding" className="w-16 h-16 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-100" />
+              </div>
+              <div className="row-start-2 col-start-2">
+                <img src="https://hcil.umd.edu/wp-content/uploads/2015/08/seminar-conference.jpg" alt="Student, College & Campus Events" className="w-16 h-16 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-200" />
+              </div>
+              <div className="row-start-2 col-start-3">
+                <img src="https://www.liysf.org.uk/wp-content/uploads/2019/01/61st-LIYSF-2019-120.jpg" alt="Cultural & Social Events" className="w-16 h-16 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-300" />
+              </div>
+              <div className="row-start-3 col-start-2">
+                <img src="https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg?auto=compress&fit=crop&w=300&q=80" alt="Business & Professional Events" className="w-16 h-16 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-400" />
+              </div>
+            </div>
+            {/* Desktop/Tablet: Straight row of 5 */}
+            <div className="hidden md:grid grid-cols-5 gap-4 w-full animate-fade-in-up">
+              <img src="https://cdn10.phillymag.com/wp-content/uploads/sites/3/2018/11/live-music-bbt-pavilion-1024x683.jpg" alt="Live Concert" className="w-24 h-24 md:w-28 md:h-28 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in" />
+              <img src="https://eventsbyliz.com.ph/wp-content/uploads/2019/12/The-first-Wedding-Event-at-Acacia-Hotel.-Congratulations-JOKO-amp.xx&oh=2a65ce0fde7916aa6d97a8e3e8d59fb6&oe=5EB3092D.jpeg" alt="Wedding" className="w-24 h-24 md:w-28 md:h-28 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-100" />
+              <img src="https://hcil.umd.edu/wp-content/uploads/2015/08/seminar-conference.jpg" alt="Student, College & Campus Events" className="w-24 h-24 md:w-28 md:h-28 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-200" />
+              <img src="https://www.liysf.org.uk/wp-content/uploads/2019/01/61st-LIYSF-2019-120.jpg" alt="Cultural & Social Events" className="w-24 h-24 md:w-28 md:h-28 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-300" />
+              <img src="https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg?auto=compress&fit=crop&w=300&q=80" alt="Business & Professional Events" className="w-24 h-24 md:w-28 md:h-28 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-400" />
+            </div>
           </div>
 
           {/* Search and Filter */}
-          <div className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100/80 backdrop-blur-md rounded-xl border border-blue-200 shadow-xl p-6 mb-4 animate-on-scroll">
-            <div className="flex flex-col md:flex-row gap-4 items-center">
+          <div className="rounded-xl border border-blue-200 mb-4 animate-on-scroll p-4 md:p-6 shadow-md md:shadow-xl backdrop-blur-md bg-white/90 md:bg-gradient-to-r md:from-blue-100 md:via-purple-100 md:to-pink-100/80">
+            <div className="flex flex-col md:flex-row gap-3 md:gap-4 items-stretch md:items-center">
               <div className="flex-1 relative flex items-center">
                 <Search className="absolute left-3 top-3 h-5 w-5 text-blue-500" />
                 <input
@@ -432,22 +448,22 @@ const HomePage: React.FC = () => {
                   value={pendingSearchTerm}
                   onChange={(e) => setPendingSearchTerm(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') { handleSearch(); } }}
-                  className="w-full pl-10 pr-4 py-3 bg-gradient-to-r from-white via-blue-50 to-purple-50 border-2 border-blue-300 rounded-lg text-gray-900 placeholder-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-md"
+                  className="w-full pl-10 pr-4 py-3 bg-white md:bg-gradient-to-r md:from-white md:via-blue-50 md:to-purple-50 border-2 border-blue-300 rounded-lg text-gray-900 placeholder-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm md:shadow-md"
                 />
                 <button
                   onClick={handleSearch}
-                  className="ml-3 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:scale-105 hover:from-purple-600 hover:to-blue-600 transition-all duration-300"
+                  className="hidden md:inline-flex ml-3 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:scale-105 hover:from-purple-600 hover:to-blue-600 transition-all duration-300"
                   style={{ position: 'relative', zIndex: 1 }}
                 >
                   Search
                 </button>
               </div>
-              <div className="relative">
+              <div className="relative w-full md:w-auto">
                 <Filter className="absolute left-3 top-3 h-5 w-5 text-blue-500" />
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="pl-10 pr-8 py-3 bg-gradient-to-r from-white via-blue-50 to-purple-50 border-2 border-blue-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none min-w-[150px] shadow-md"
+                  className="w-full md:w-auto pl-10 pr-8 py-3 bg-white md:bg-gradient-to-r md:from-white md:via-blue-50 md:to-purple-50 border-2 border-blue-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none min-w-[150px] shadow-sm md:shadow-md"
                 >
                   {categories.map(category => (
                     <option key={category} value={category} className="bg-white">
@@ -456,6 +472,13 @@ const HomePage: React.FC = () => {
                   ))}
                 </select>
               </div>
+              {/* Mobile search button */}
+              <button
+                onClick={handleSearch}
+                className="md:hidden w-full px-5 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg shadow-md"
+              >
+                Search
+              </button>
             </div>
           </div>
 

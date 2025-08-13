@@ -114,20 +114,20 @@ const SignupPage: React.FC = () => {
     <div className="relative min-h-screen w-full flex items-stretch bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Full-page background image */}
       <img src={signupImg} alt="Signup" className="absolute inset-0 w-full h-full object-cover z-0" />
-      {/* Signup form container with slide-in animation */}
-      <div className="relative z-10 w-full min-h-screen flex items-center justify-end">
-        <div className="absolute right-48 top-2 animate-slide-in-right">
-          {/* Main signup form box with border and shadow */}
-          <div className="w-full max-w-sm space-y-6 p-4 m-4 border-2 border-white rounded-2xl shadow-xl">
+      {/* Content */}
+      <div className="relative z-10 w-full min-h-screen flex items-start md:items-center justify-center md:justify-end pt-16 md:pt-0 pb-10 px-4">
+        <div className="md:absolute md:right-48 md:top-12 animate-slide-in-right">
+          {/* Signup form container */}
+          <div className="w-full max-w-[23rem] md:max-w-sm mx-auto md:mx-0 my-4 md:my-0 space-y-4 md:space-y-6 px-5 py-4 rounded-2xl border border-blue-100 shadow-2xl md:border-2 md:border-white md:bg-transparent md:shadow-xl">
             {/* Header section */}
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-900 mb-1 drop-shadow-lg">Create Your Account</h1>
-              <p className="text-gray-900 text-sm drop-shadow-md">Join Eventnity and explore amazing events</p>
+              <h1 className="text-lg md:text-2xl font-bold text-gray-900 mb-1 drop-shadow-lg">Create Your Account</h1>
+              <p className="text-gray-700 text-xs md:text-sm drop-shadow">Join Eventnity and explore amazing events</p>
             </div>
             {/* Signup Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
               {/* Name and Email Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 {/* Name Field */}
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-900 mb-1">
@@ -143,7 +143,7 @@ const SignupPage: React.FC = () => {
                       type="text"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className={`block w-full pl-8 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                      className={`block w-full pl-8 pr-3 py-3 md:py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                         errors.name ? 'border-red-300 bg-red-50' : 'border-gray-300'
                       }`}
                       placeholder="Full name"
@@ -171,7 +171,7 @@ const SignupPage: React.FC = () => {
                       type="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`block w-full pl-8 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                      className={`block w-full pl-8 pr-3 py-3 md:py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                         errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300'
                       }`}
                       placeholder="Email"
@@ -186,7 +186,7 @@ const SignupPage: React.FC = () => {
                 </div>
               </div>
               {/* Password Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 {/* Password Field */}
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-gray-900 mb-1">
@@ -202,7 +202,7 @@ const SignupPage: React.FC = () => {
                       type={showPassword ? 'text' : 'password'}
                       value={formData.password}
                       onChange={handleInputChange}
-                      className={`block w-full pl-8 pr-8 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                      className={`block w-full pl-8 pr-10 py-3 md:py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                         errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'
                       }`}
                       placeholder="Password"
@@ -210,7 +210,7 @@ const SignupPage: React.FC = () => {
                     {/* Password visibility toggle */}
                     <button
                       type="button"
-                      className="absolute inset-y-0 right-0 pr-2 flex items-center"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
@@ -242,7 +242,7 @@ const SignupPage: React.FC = () => {
                       type={showConfirmPassword ? 'text' : 'password'}
                       value={formData.confirmPassword}
                       onChange={handleInputChange}
-                      className={`block w-full pl-8 pr-8 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                      className={`block w-full pl-8 pr-10 py-3 md:py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                         errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-300'
                       }`}
                       placeholder="Confirm password"
@@ -250,7 +250,7 @@ const SignupPage: React.FC = () => {
                     {/* Confirm password visibility toggle */}
                     <button
                       type="button"
-                      className="absolute inset-y-0 right-0 pr-2 flex items-center"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                       {showConfirmPassword ? (
@@ -269,7 +269,7 @@ const SignupPage: React.FC = () => {
                 </div>
               </div>
               {/* Phone and Date of Birth Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 {/* Phone Field */}
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-gray-900 mb-1">
@@ -285,7 +285,7 @@ const SignupPage: React.FC = () => {
                       type="tel"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className={`block w-full pl-8 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                      className={`block w-full pl-8 pr-3 py-3 md:py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                         errors.phone ? 'border-red-300 bg-red-50' : 'border-gray-300'
                       }`}
                       placeholder="Phone number"
@@ -313,7 +313,7 @@ const SignupPage: React.FC = () => {
                       type="date"
                       value={formData.dateOfBirth}
                       onChange={handleInputChange}
-                      className={`block w-full pl-8 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                      className={`block w-full pl-8 pr-3 py-3 md:py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                         errors.dateOfBirth ? 'border-red-300 bg-red-50' : 'border-gray-300'
                       }`}
                     />
@@ -341,7 +341,7 @@ const SignupPage: React.FC = () => {
                     type="text"
                     value={formData.location}
                     onChange={handleInputChange}
-                    className={`block w-full pl-8 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                    className={`block w-full pl-8 pr-3 py-3 md:py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                       errors.location ? 'border-red-300 bg-red-50' : 'border-gray-300'
                     }`}
                     placeholder="City/Location"
@@ -376,7 +376,7 @@ const SignupPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">
