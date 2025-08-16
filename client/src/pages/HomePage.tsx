@@ -417,7 +417,7 @@ const HomePage: React.FC = () => {
             {/* Mobile: Cross layout for 5 images */}
             <div className="grid grid-cols-3 grid-rows-3 gap-3 w-56 mx-auto md:hidden animate-fade-in-up">
               <div className="row-start-1 col-start-2">
-                <img src="https://cdn10.phillymag.com/wp-content/uploads/sites/3/2018/11/live-music-bbt-pavilion-1024x683.jpg" alt="Live Concert" className="w-16 h-16 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in" />
+                <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=400&q=80" alt="Live Concert" className="w-16 h-16 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in" />
               </div>
               <div className="row-start-2 col-start-1">
                 <img src="https://eventsbyliz.com.ph/wp-content/uploads/2019/12/The-first-Wedding-Event-at-Acacia-Hotel.-Congratulations-JOKO-amp.xx&oh=2a65ce0fde7916aa6d97a8e3e8d59fb6&oe=5EB3092D.jpeg" alt="Wedding" className="w-16 h-16 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-100" />
@@ -434,7 +434,7 @@ const HomePage: React.FC = () => {
             </div>
             {/* Desktop/Tablet: Straight row of 5 */}
             <div className="hidden md:grid grid-cols-5 gap-4 w-full animate-fade-in-up">
-              <img src="https://cdn10.phillymag.com/wp-content/uploads/sites/3/2018/11/live-music-bbt-pavilion-1024x683.jpg" alt="Live Concert" className="w-24 h-24 md:w-28 md:h-28 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in" />
+              <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=400&q=80" alt="Live Concert" className="w-24 h-24 md:w-28 md:h-28 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in" />
               <img src="https://eventsbyliz.com.ph/wp-content/uploads/2019/12/The-first-Wedding-Event-at-Acacia-Hotel.-Congratulations-JOKO-amp.xx&oh=2a65ce0fde7916aa6d97a8e3e8d59fb6&oe=5EB3092D.jpeg" alt="Wedding" className="w-24 h-24 md:w-28 md:h-28 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-100" />
               <img src="https://hcil.umd.edu/wp-content/uploads/2015/08/seminar-conference.jpg" alt="Student, College & Campus Events" className="w-24 h-24 md:w-28 md:h-28 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-200" />
               <img src="https://www.liysf.org.uk/wp-content/uploads/2019/01/61st-LIYSF-2019-120.jpg" alt="Cultural & Social Events" className="w-24 h-24 md:w-28 md:h-28 rounded-xl shadow-lg border-2 border-white object-cover transform hover:scale-105 transition duration-300 animate-zoom-in delay-300" />
