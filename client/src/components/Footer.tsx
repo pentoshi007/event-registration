@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { api } from '../api';
 import { 
   Calendar, 
   Users, 
@@ -23,20 +24,9 @@ const Footer: React.FC = () => {
     setSubscriptionStatus('idle');
 
     try {
-      const response = await fetch('/api/newsletter/subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: email.trim() }),
-      });
-
-      if (response.ok) {
-        setSubscriptionStatus('success');
-        setEmail('');
-      } else {
-        setSubscriptionStatus('error');
-      }
+      await api.subscribeNewsletter(email.trim());
+      setSubscriptionStatus('success');
+      setEmail('');
     } catch (error) {
       console.error('Subscription error:', error);
       setSubscriptionStatus('error');
