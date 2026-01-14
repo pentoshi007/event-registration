@@ -205,4 +205,13 @@ Thumbs.db
 
 # Temporary files
 *.tmp
-*.temp 
+*.temp
+*.backup
+
+# Documentation that shouldn't be in repo
+*.pdf
+IMPLEMENTATION_STATUS.md
+PROJECT_STATUS.md
+PROJECT_COMPLETION_STATUS.md
+FIREBASE_SETUP.md
+IMPLEMENTATION_GUIDE.md 

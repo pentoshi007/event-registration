@@ -62,10 +62,8 @@ const HomePage: React.FC = () => {
   };
 
   useEffect(() => {
-    // Set client-side flag to prevent hydration mismatches
     setIsClient(true);
-    loadInitialEvents();
-    loadCategories();
+    loadInitialData();
   }, []);
 
   useEffect(() => {
@@ -142,6 +140,83 @@ const HomePage: React.FC = () => {
     }
   };
 
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+      const initialLimit = getInitialLimit();
+
+      const params: {
+        limit: number;
+        offset: number;
+        category?: string;
+        search?: string;
+      } = {
+        limit: initialLimit,
+        offset: 0,
+      };
+
+      if (selectedCategory !== 'All') {
+        params.category = selectedCategory;
+      }
+
+      if (activeSearchTerm.trim()) {
+        params.search = activeSearchTerm.trim();
+      }
+
+      const [eventsResponse, categoriesResponse] = await Promise.all([
+        api.getEvents(params),
+        api.getCategories()
+      ]);
+
+      setEvents(eventsResponse.events || []);
+      setHasMore(eventsResponse.pagination.hasMore);
+      setNextOffset(eventsResponse.pagination.nextOffset);
+
+      if (categoriesResponse.success && categoriesResponse.categories) {
+        setCategories(['All', ...categoriesResponse.categories]);
+      }
+    } catch (error) {
+      console.error('Failed to load events:', error);
+      const mockEvents = [
+        {
+          _id: '1',
+          title: 'Tech Innovation Summit 2024',
+          description: 'Join industry leaders and innovators for a day of cutting-edge technology discussions, networking, and hands-on workshops. Discover the latest trends in AI, blockchain, and sustainable tech.',
+          date: '2024-03-15',
+          time: '09:00',
+          location: 'San Francisco Convention Center',
+          maxAttendees: 500,
+          currentAttendees: 342,
+          price: 299,
+          image: 'https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg?auto=compress&fit=crop&w=800&q=80',
+          category: 'Technology',
+          organizer: 'TechVision Inc.',
+          tags: ['AI', 'Innovation', 'Networking', 'Workshop']
+        },
+        {
+          _id: '2',
+          title: 'Business Leadership Forum',
+          description: 'Meet top business leaders and learn about the latest trends in entrepreneurship and management.',
+          date: '2024-04-10',
+          time: '10:00',
+          location: 'New York Business Center',
+          maxAttendees: 300,
+          currentAttendees: 180,
+          price: 199,
+          image: 'https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg?auto=compress&fit=crop&w=800&q=80',
+          category: 'Business',
+          organizer: 'BizLeaders',
+          tags: ['Business', 'Leadership', 'Networking']
+        }
+      ];
+      setEvents(mockEvents);
+      setHasMore(true);
+      setCategories(['All', 'Technology', 'Business', 'Marketing', 'Design', 'Education']);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const loadInitialEvents = async () => {
     try {
       setLoading(true);
@@ -169,12 +244,8 @@ const HomePage: React.FC = () => {
       setEvents(response.events || []);
       setHasMore(response.pagination.hasMore);
       setNextOffset(response.pagination.nextOffset);
-
-      // Refresh categories in case new ones were added
-      loadCategories();
     } catch (error) {
       console.error('Failed to load events:', error);
-      // Use fallback mock data
       const mockEvents = [
         {
           _id: '1',
@@ -259,20 +330,6 @@ const HomePage: React.FC = () => {
       console.error('Failed to load more events:', error);
     } finally {
       setLoadingMore(false);
-    }
-  };
-
-  // Load categories from API
-  const loadCategories = async () => {
-    try {
-      const response = await api.getCategories();
-      if (response.success && response.categories) {
-        setCategories(['All', ...response.categories]);
-      }
-    } catch (error) {
-      console.error('Failed to load categories:', error);
-      // Fallback to basic categories if API fails
-      setCategories(['All', 'Technology', 'Business', 'Marketing', 'Design', 'Education']);
     }
   };
 
